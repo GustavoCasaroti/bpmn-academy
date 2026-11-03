@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: 248 250 252;
+  --surface-raised: 255 255 255;
+  --surface-sunk: 241 245 249;
+  --line: 226 232 240;
+  --ink: 15 23 42;
+  --ink-muted: 71 85 105;
+  --ink-subtle: 90 106 125;
+  --grid-dot: 203 213 225;
+}
+
+.dark {
+  --surface: 15 23 42;
+  --surface-raised: 30 41 59;
+  --surface-sunk: 2 6 23;
+  --line: 51 65 85;
+  --ink: 241 245 249;
+  --ink-muted: 165 180 200;
+  --ink-subtle: 148 163 184;
+  --grid-dot: 51 65 85;
+}
+
+* {
+  border-color: rgb(var(--line));
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: rgb(var(--surface));
+  color: rgb(var(--ink));
+  font-feature-settings: "cv02", "cv03", "cv04";
+}
+
+::selection {
+  background-color: rgb(99 102 241 / 0.22);
+}
+
+/* Scrollbars discretos e consistentes */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--line));
+    border-radius: 9999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(rgb(var(--grid-dot)) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Área de diagrama do React Flow */
+.react-flow__attribution {
+  display: none;
+}
+
+.react-flow__edge-path {
+  stroke-width: 1.8;
+}
+
+.react-flow__edge.edge-sequence .react-flow__edge-path {
+  stroke: #4338ca;
+}
+
+.react-flow__edge.edge-message .react-flow__edge-path {
+  stroke: #4338ca;
+  stroke-dasharray: 8 5;
+}
+
+.react-flow__edge.edge-association .react-flow__edge-path {
+  stroke: #6d28d9;
+  stroke-dasharray: 3 4;
+}
+
+.react-flow__edge.edge-selected .react-flow__edge-path {
+  stroke-width: 3;
+}
+
+.react-flow__edge-label {
+  background-color: transparent;
+}
+
+.react-flow__node {
+  font-family: inherit;
+}
+
+.react-flow__handle {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.react-flow__node:hover .react-flow__handle,
+.react-flow__node:focus-within .react-flow__handle,
+.lab-node-selected .react-flow__handle {
+  opacity: 1;
+}
+
+.react-flow__controls {
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.12);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  border: 1px solid rgb(var(--line));
+}
+
+.react-flow__controls-button {
+  background-color: rgb(var(--surface-raised));
+  border-bottom: 1px solid rgb(var(--line));
+  color: rgb(var(--ink-muted));
+  fill: rgb(var(--ink-muted));
+}
+
+.react-flow__controls-button:hover {
+  background-color: rgb(var(--surface-sunk));
+}
+
+.react-flow__background {
+  transition: background-color 0.3s ease;
+}
