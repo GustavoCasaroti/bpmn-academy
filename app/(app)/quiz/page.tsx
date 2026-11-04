@@ -80,7 +80,7 @@ export default function QuizPage() {
         <p className="mt-1 text-sm text-ink-muted">
           Quantas questões de cada categoria você já respondeu.
         </p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {Object.entries(QUIZ_CATEGORY_LABELS).map(([cat, label]) => {
             const total = quizQuestions.filter((q) => q.category === cat).length;
             const entry = byCategory.get(cat);

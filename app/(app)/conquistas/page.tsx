@@ -156,7 +156,7 @@ export default function ConquistasPage() {
           description="Desbloqueadas automaticamente conforme seu avanço."
         />
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {ACHIEVEMENTS.map((achievement) => {
             const isUnlocked = unlocked.has(achievement.id);
             const Icon = getIcon(achievement.icon);
@@ -205,7 +205,7 @@ export default function ConquistasPage() {
       {/* ---------- Níveis ---------- */}
       <section className="mt-8">
         <SectionHeader eyebrow="Progressão" title="Níveis" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {LEVELS.map((lvl) => {
             const reached = progress.xp >= lvl.minXp;
             const current = lvl.level === level.level;

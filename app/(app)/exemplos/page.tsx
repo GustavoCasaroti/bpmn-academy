@@ -120,7 +120,7 @@ export default function ExemplosPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {filtered.map((ex) => {
             const previewNodes = ex.diagram.nodes
               .filter((n) =>
@@ -167,7 +167,7 @@ export default function ExemplosPage() {
                   </div>
 
                   <div className="mt-3 flex items-center justify-between border-t border-line pt-3">
-                    <div className="flex gap-1.5">
+                    <div className="flex min-w-0 gap-1.5">
                       {symbolSet.map((id) => {
                         const symbol = bpmnSymbols.find((s) => s.id === id);
                         if (!symbol) return null;
@@ -175,7 +175,7 @@ export default function ExemplosPage() {
                           <span
                             key={id}
                             title={symbol.namePt}
-                            className="flex h-9 w-11 items-center justify-center rounded bg-surface-raised"
+                            className="flex h-9 w-11 min-w-0 items-center justify-center rounded bg-surface-raised"
                           >
                             <BpmnSymbolGlyph
                               render={symbol.render}

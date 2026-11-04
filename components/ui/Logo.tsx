@@ -1,9 +1,15 @@
+import { useId } from "react";
 import { cn } from "@/lib/utils";
 
 /**
  * Identidade visual BPMN Academy.
  * Marca derivada do símbolo oficial de formatura (chapéu) sobre uma linha
  * de fluxo — mesma linguagem do favicon. Vetorial, legível em 16px.
+ *
+ * Os IDs dos gradientes são gerados por instância (useId): várias marcas
+ * renderizam na mesma página (sidebar, header, drawer, rodapé) e IDs
+ * duplicados fariam o navegador resolver `url(#…)` sempre pela primeira
+ * ocorrência — inclusive quando ela está oculta.
  */
 
 interface MarkProps {
@@ -20,6 +26,11 @@ export function BrandMark({
   className,
   title = "BPMN Academy",
 }: MarkProps) {
+  const uid = useId().replace(/:/g, "");
+  const idTop = `bpmn-cap-top-${uid}`;
+  const idBase = `bpmn-cap-base-${uid}`;
+  const idBg = `bpmn-cap-bg-${uid}`;
+
   return (
     <svg
       width={size}
@@ -30,29 +41,29 @@ export function BrandMark({
       className={cn(background && "rounded-[14px]", className)}
     >
       <defs>
-        <linearGradient id="bpmn-cap-top" x1="10" y1="15" x2="54" y2="33" gradientUnits="userSpaceOnUse">
+        <linearGradient id={idTop} x1="10" y1="15" x2="54" y2="33" gradientUnits="userSpaceOnUse">
           <stop stopColor="#a855f7" />
           <stop offset="1" stopColor="#7c3aed" />
         </linearGradient>
-        <linearGradient id="bpmn-cap-base" x1="22" y1="28" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+        <linearGradient id={idBase} x1="22" y1="28" x2="44" y2="44" gradientUnits="userSpaceOnUse">
           <stop stopColor="#6366f1" />
           <stop offset="1" stopColor="#4338ca" />
         </linearGradient>
-        <linearGradient id="bpmn-cap-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+        <linearGradient id={idBg} x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
           <stop stopColor="#f2effe" />
           <stop offset="1" stopColor="#e7e3fd" />
         </linearGradient>
       </defs>
 
-      {background && <rect width="64" height="64" rx="14" fill="url(#bpmn-cap-bg)" />}
+      {background && <rect width="64" height="64" rx="14" fill={`url(#${idBg})`} />}
 
       {/* Corpo do chapéu (atrás da placa) */}
       <path
         d="M23 29v7.5c0 4.1 3.4 7.5 7.5 7.5h4c4.1 0 7.5-3.4 7.5-7.5V29L32.5 34z"
-        fill="url(#bpmn-cap-base)"
+        fill={`url(#${idBase})`}
       />
       {/* Placa (losango) */}
-      <path d="M32 15 54.5 24 32 33 9.5 24z" fill="url(#bpmn-cap-top)" />
+      <path d="M32 15 54.5 24 32 33 9.5 24z" fill={`url(#${idTop})`} />
       {/* Cordão e borla */}
       <path d="M52.5 25.5v9.5" stroke="#4338ca" strokeWidth="2.2" strokeLinecap="round" />
       <circle cx="52.5" cy="37.5" r="3.2" fill="#6d28d9" />

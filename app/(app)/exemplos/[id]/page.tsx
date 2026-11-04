@@ -101,7 +101,7 @@ export default function ExemploDetalhePage({
     <div className="mx-auto max-w-6xl animate-fade-up">
       <Link
         href="/exemplos"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted transition hover:text-ink"
+        className="mb-4 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-ink-muted transition hover:text-ink"
       >
         <ArrowLeft size={15} />
         Exemplos de processos
@@ -121,7 +121,7 @@ export default function ExemploDetalhePage({
         <h1 className="mt-2 text-xl font-semibold tracking-tight text-ink sm:text-2xl">
           {example.title}
         </h1>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-xl bg-surface-sunk p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">
               Problema
@@ -141,7 +141,7 @@ export default function ExemploDetalhePage({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_320px]">
+      <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
         {/* ---------- Diagrama ---------- */}
         <div className="min-w-0 space-y-4">
           <Card className="overflow-hidden">
@@ -437,7 +437,7 @@ export default function ExemploDetalhePage({
                       </span>
                       <Link
                         href="/simbolos"
-                        className="flex-shrink-0 text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+                        className="inline-flex min-h-10 flex-shrink-0 items-center px-2 text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
                       >
                         Ver
                       </Link>

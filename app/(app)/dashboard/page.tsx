@@ -147,7 +147,7 @@ export default function DashboardPage() {
       </section>
 
       {/* ---------- Nível + Conquistas ---------- */}
-      <section className="mt-6 grid gap-4 lg:grid-cols-3">
+      <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card className="p-5 lg:col-span-2">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
             <h2 className="text-sm font-semibold text-ink">Conquistas</h2>
             <Link
               href="/conquistas"
-              className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              className="inline-flex min-h-10 items-center text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
             >
               Ver todas
             </Link>
@@ -235,7 +235,7 @@ export default function DashboardPage() {
           description="Sugestões com base no seu progresso atual."
         />
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <NextStepCard
             icon={<Route size={18} />}
             eyebrow="Trilha"
@@ -292,7 +292,7 @@ export default function DashboardPage() {
           title="Explore a plataforma"
           description="Biblioteca de símbolos, exemplos comentados e a trilha completa."
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ExploreCard
             icon={<Shapes size={20} />}
             title="Biblioteca de símbolos"
@@ -321,7 +321,7 @@ export default function DashboardPage() {
           title="Como funciona"
           description="Quatro etapas para dominar a notação BPMN 2.0."
         />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               icon: <BookOpen size={18} />,
@@ -454,7 +454,7 @@ function NextStepCard({
       )}
       <Link
         href={href}
-        className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+        className="mt-4 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
       >
         {cta}
         <ArrowRight size={15} />

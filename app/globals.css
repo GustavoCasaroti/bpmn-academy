@@ -147,11 +147,18 @@ body {
   border: 1px solid rgb(var(--line));
 }
 
-.react-flow__controls-button {
+.react-flow__controls .react-flow__controls-button {
+  width: 32px;
+  height: 32px;
   background-color: rgb(var(--surface-raised));
   border-bottom: 1px solid rgb(var(--line));
   color: rgb(var(--ink-muted));
   fill: rgb(var(--ink-muted));
+}
+
+.react-flow__controls .react-flow__controls-button svg {
+  width: 16px;
+  height: 16px;
 }
 
 .react-flow__controls-button:hover {

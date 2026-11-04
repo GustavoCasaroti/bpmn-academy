@@ -136,7 +136,7 @@ export function SymbolPalette({
                     fit={SYMBOL_BOX.tiny}
                   />
                 </span>
-                <span className="w-full truncate text-center text-[10px] leading-tight text-ink-muted group-hover:text-ink">
+                <span className="w-full truncate text-center text-[11px] leading-tight text-ink-muted group-hover:text-ink">
                   {symbol.namePt}
                 </span>
                 <span

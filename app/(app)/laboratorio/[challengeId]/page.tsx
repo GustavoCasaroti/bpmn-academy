@@ -381,7 +381,7 @@ function DesafioRunner({
     <div className="mx-auto max-w-7xl animate-fade-up">
       <Link
         href="/laboratorio"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted transition hover:text-ink"
+        className="mb-4 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-ink-muted transition hover:text-ink"
       >
         <ArrowLeft size={15} />
         Laboratório BPMN
@@ -458,7 +458,7 @@ function DesafioRunner({
       )}
 
       {/* ---------- Corpo ---------- */}
-      <div className="mt-4 grid gap-4 lg:grid-cols-[280px_1fr_320px]">
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[280px_1fr_320px]">
         {/* Paleta */}
         {isEditable && (
           <aside
@@ -697,7 +697,7 @@ function DesafioRunner({
                   {challenge.requiredSymbols.map((id) => (
                     <span
                       key={id}
-                      className="rounded-full bg-surface-sunk px-2 py-0.5 text-[10px] text-ink-muted"
+                      className="rounded-full bg-surface-sunk px-2 py-0.5 text-[11px] text-ink-muted"
                     >
                       {id}
                     </span>

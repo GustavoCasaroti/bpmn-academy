@@ -172,10 +172,10 @@ export default function LandingPage() {
               {/* Faixa de fluxo decorativa com os símbolos reais da notação */}
               <div
                 aria-hidden="true"
-                className="mt-12 flex flex-wrap items-center justify-center gap-x-2 gap-y-3 rounded-2xl border border-line bg-surface-raised/70 px-4 py-5 backdrop-blur sm:justify-start"
+                className="scrollbar-thin mt-12 flex flex-nowrap items-center justify-start gap-x-2 gap-y-3 overflow-x-auto rounded-2xl border border-line bg-surface-raised/70 px-4 py-5 backdrop-blur sm:flex-wrap sm:overflow-visible"
               >
                 {FLOW.map((item, index) => (
-                  <div key={item.label} className="flex items-center gap-2">
+                  <div key={item.label} className="flex flex-shrink-0 items-center gap-2">
                     {index > 0 && (
                       <svg
                         width="26"
@@ -207,7 +207,7 @@ export default function LandingPage() {
 
         {/* ---------------- Destaques ---------------- */}
         <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {HIGHLIGHTS.map(({ icon: Icon, title, description, href, cta }) => (
               <Link
                 key={title}

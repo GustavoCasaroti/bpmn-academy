@@ -94,7 +94,7 @@ export default function LaboratorioPage() {
       </div>
 
       {/* ---------- Filtros por modo ---------- */}
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {(["build", "fix", "identify", "simulate"] as const).map((m) => {
           const info = CHALLENGE_MODES[m];
           const Icon = MODE_ICON[m];
@@ -144,7 +144,7 @@ export default function LaboratorioPage() {
           description="Escolha outro modo de prática para continuar."
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {filtered.map((challenge, index) => {
             const unlocked = isUnlocked(challenge);
             const done = progress.challenges[challenge.id];
@@ -233,7 +233,7 @@ export default function LaboratorioPage() {
       {/* ---------- Resumo dos modos ---------- */}
       <Card className="mt-8 p-5">
         <h2 className="text-base font-semibold text-ink">Como cada modo funciona</h2>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {(["build", "fix", "identify", "simulate"] as const).map((m) => {
             const info = CHALLENGE_MODES[m];
             const Icon = MODE_ICON[m];

@@ -161,7 +161,7 @@ export default function SimbolosPage() {
           }
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((symbol) => {
             const seen = progress.visitedSymbols.includes(symbol.id);
             const category = symbolCategories.find(
@@ -201,7 +201,7 @@ export default function SimbolosPage() {
                   {symbol.summary}
                 </p>
                 <span
-                  className="mt-2.5 inline-block w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                  className="mt-2.5 inline-block w-fit rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
                   style={{
                     color: category?.color,
                     backgroundColor: `${category?.color}1a`,
@@ -266,7 +266,7 @@ function SymbolTab({
       {label}
       <span
         className={cn(
-          "rounded-full px-1.5 text-[10px] font-semibold leading-4",
+          "rounded-full px-1.5 text-[11px] font-semibold leading-4",
           active ? "bg-white/20 text-white" : "bg-surface-sunk text-ink-subtle"
         )}
       >

@@ -107,7 +107,7 @@ export default function ModulePage({
       {/* ---------- Cabeçalho ---------- */}
       <Link
         href="/trilha"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted transition hover:text-ink"
+        className="mb-4 inline-flex min-h-10 items-center gap-1.5 text-sm font-medium text-ink-muted transition hover:text-ink"
       >
         <ArrowLeft size={15} />
         Trilha de aprendizado
@@ -173,9 +173,9 @@ export default function ModulePage({
       )}
 
       {/* ---------- Conteúdo ---------- */}
-      <div className="mt-6 grid gap-5 lg:grid-cols-[260px_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[260px_1fr]">
         {/* Lista de lições */}
-        <aside className="lg:sticky lg:top-6 lg:self-start">
+        <aside className="min-w-0 lg:sticky lg:top-6 lg:self-start">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-subtle">
             Lições
           </p>
