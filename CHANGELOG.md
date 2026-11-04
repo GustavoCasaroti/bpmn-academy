@@ -129,6 +129,15 @@ Alterações em revisão — nenhum commit realizado até o momento.
 - Removido import não usado de `BpmnSymbolGlyph` em
   `app/(app)/laboratorio/[challengeId]/page.tsx`.
 
+### Corrigido
+
+- **Modal da biblioteca de símbolos não abria visivelmente** — o `position: fixed`
+  do backdrop era capturado pelo `transform` mantido pela animação `fade-up` do
+  wrapper da página (containing block), deixando o modal preso ao fluxo do
+  documento e fora da viewport. O componente `Modal` agora é renderizado via
+  `createPortal` em `document.body`, corrigindo isso em todas as páginas que
+  utilizam modais.
+
 ### Validação
 
 - `tsc --noEmit` sem erros.

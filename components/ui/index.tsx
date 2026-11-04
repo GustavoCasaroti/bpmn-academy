@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -336,7 +337,15 @@ export function Modal({
     xl: "max-w-6xl",
   };
 
-  return (
+  /**
+   * Portal para document.body: isola o modal de qualquer ancestral com
+   * `transform`/`filter` (ex.: wrappers com animação `fade-up`), que
+   * passariam a atuar como containing block e prenderiam o `position: fixed`
+   * fora da viewport.
+   */
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onMouseDown={(e) => {
@@ -370,7 +379,8 @@ export function Modal({
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
