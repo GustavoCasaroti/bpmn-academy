@@ -6,7 +6,7 @@ import { ArrowRight, Search, Workflow } from "lucide-react";
 import { Badge, Card, EmptyState, SectionHeader } from "@/components/ui";
 import { processExamples } from "@/data/examples";
 import { bpmnSymbols } from "@/data/symbols";
-import { BpmnSymbolGlyph } from "@/components/bpmn/BpmnGlyph";
+import { BpmnSymbolGlyph, SYMBOL_BOX } from "@/components/bpmn/BpmnGlyph";
 import { cn } from "@/lib/utils";
 import type { ProcessExample } from "@/types";
 
@@ -175,12 +175,12 @@ export default function ExemplosPage() {
                           <span
                             key={id}
                             title={symbol.namePt}
-                            className="flex h-7 w-8 items-center justify-center rounded bg-surface-raised"
+                            className="flex h-9 w-11 items-center justify-center rounded bg-surface-raised"
                           >
                             <BpmnSymbolGlyph
                               render={symbol.render}
                               label={symbol.namePt}
-                              className="scale-75"
+                              fit={SYMBOL_BOX.micro}
                             />
                           </span>
                         );

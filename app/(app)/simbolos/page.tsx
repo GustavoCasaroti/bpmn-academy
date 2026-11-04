@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button, EmptyState, Modal, SectionHeader } from "@/components/ui";
 import { bpmnSymbols, symbolCategories } from "@/data/symbols";
-import { BpmnSymbolGlyph } from "@/components/bpmn/BpmnGlyph";
+import { BpmnSymbolGlyph, SYMBOL_BOX } from "@/components/bpmn/BpmnGlyph";
 import { DiagramView } from "@/components/bpmn/DiagramView";
 import { useProgressStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,7 @@ export default function SimbolosPage() {
   }, [selected, visitSymbol]);
 
   return (
-    <div className="mx-auto max-w-6xl animate-fade-up">
+    <div className="mx-auto max-w-7xl animate-fade-up">
       <SectionHeader
         eyebrow="Referência"
         title="Biblioteca de símbolos"
@@ -88,26 +88,34 @@ export default function SimbolosPage() {
           )}
         </div>
 
-        <div className="scrollbar-thin flex gap-2 overflow-x-auto pb-1">
-          <FilterChip
-            active={filter === "all"}
-            onClick={() => setFilter("all")}
-            label={`Todos (${bpmnSymbols.length})`}
-          />
-          {symbolCategories.map((cat) => {
-            const count = bpmnSymbols.filter((s) => s.category === cat.id).length;
-            return (
-              <FilterChip
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
+          {/* ---------- Abas por categoria ---------- */}
+          <div
+            role="tablist"
+            aria-label="Categorias de símbolos BPMN"
+            className="scrollbar-thin no-scrollbar -mx-1 flex min-w-0 flex-1 gap-1.5 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-x-visible"
+          >
+            <SymbolTab
+              active={filter === "all"}
+              onClick={() => setFilter("all")}
+              label="Todos"
+              count={bpmnSymbols.length}
+            />
+            {symbolCategories.map((cat) => (
+              <SymbolTab
                 key={cat.id}
                 active={filter === cat.id}
                 onClick={() => setFilter(cat.id)}
-                label={`${cat.name} (${count})`}
+                label={cat.name}
+                count={bpmnSymbols.filter((s) => s.category === cat.id).length}
                 color={cat.color}
               />
-            );
-          })}
+            ))}
+          </div>
+
           <button
             onClick={() => setOnlyUnseen((v) => !v)}
+            aria-pressed={onlyUnseen}
             className={cn(
               "flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition",
               onlyUnseen
@@ -163,40 +171,37 @@ export default function SimbolosPage() {
               <button
                 key={symbol.id}
                 onClick={() => setSelected(symbol)}
-                className="group rounded-xl border border-line bg-surface-raised p-4 text-left shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-card-hover"
+                className="group flex flex-col rounded-xl border border-line bg-surface-raised p-4 text-left shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-card-hover"
               >
-                <div className="flex items-start gap-3">
-                  <span className="flex h-16 w-20 flex-shrink-0 items-center justify-center rounded-lg bg-surface-sunk transition group-hover:bg-white dark:group-hover:bg-slate-800">
-                    <BpmnSymbolGlyph
-                      render={symbol.render}
-                      label={symbol.namePt}
-                      className="scale-90"
-                    />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-1">
-                      <p className="text-sm font-semibold leading-snug text-ink">
-                        {symbol.namePt}
-                      </p>
-                      {seen && (
-                        <span
-                          className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white"
-                          title="Você já visitou este símbolo"
-                        >
-                          <Check size={10} />
-                        </span>
-                      )}
-                    </div>
-                    <p className="mt-0.5 truncate text-xs text-ink-subtle">
-                      {symbol.nameEn}
-                    </p>
-                  </div>
+                {/* Palco de enquadramento: símbolo escalado proporcionalmente, nunca cortado */}
+                <span className="mb-3 flex h-24 w-full flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-sunk transition group-hover:bg-white dark:group-hover:bg-slate-800">
+                  <BpmnSymbolGlyph
+                    render={symbol.render}
+                    label={symbol.namePt}
+                    fit={SYMBOL_BOX.stage}
+                  />
+                </span>
+                <div className="flex items-start justify-between gap-1">
+                  <p className="text-sm font-semibold leading-snug text-ink">
+                    {symbol.namePt}
+                  </p>
+                  {seen && (
+                    <span
+                      className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white"
+                      title="Você já visitou este símbolo"
+                    >
+                      <Check size={10} />
+                    </span>
+                  )}
                 </div>
-                <p className="mt-2.5 line-clamp-2 text-xs leading-relaxed text-ink-muted">
+                <p className="mt-0.5 truncate text-xs text-ink-subtle">
+                  {symbol.nameEn}
+                </p>
+                <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-ink-muted">
                   {symbol.summary}
                 </p>
                 <span
-                  className="mt-2.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                  className="mt-2.5 inline-block w-fit rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
                   style={{
                     color: category?.color,
                     backgroundColor: `${category?.color}1a`,
@@ -224,28 +229,32 @@ export default function SimbolosPage() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Filtro                                                              */
+/* Aba de categoria                                                    */
 /* ------------------------------------------------------------------ */
 
-function FilterChip({
+function SymbolTab({
   active,
   onClick,
   label,
+  count,
   color,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
+  count: number;
   color?: string;
 }) {
   return (
     <button
+      role="tab"
+      aria-selected={active}
       onClick={onClick}
       className={cn(
-        "flex h-9 flex-shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition",
+        "flex h-9 flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 text-sm font-medium transition",
         active
-          ? "border-brand-400 bg-brand-600 text-white"
-          : "border-line bg-surface-raised text-ink-muted hover:border-brand-300"
+          ? "border-brand-400 bg-brand-600 text-white shadow-sm"
+          : "border-line bg-surface-raised text-ink-muted hover:border-brand-300 hover:text-ink"
       )}
     >
       {color && !active && (
@@ -255,6 +264,14 @@ function FilterChip({
         />
       )}
       {label}
+      <span
+        className={cn(
+          "rounded-full px-1.5 text-[10px] font-semibold leading-4",
+          active ? "bg-white/20 text-white" : "bg-surface-sunk text-ink-subtle"
+        )}
+      >
+        {count}
+      </span>
     </button>
   );
 }
@@ -269,8 +286,12 @@ function SymbolDetail({ symbol }: { symbol: BpmnSymbol }) {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start gap-4 rounded-xl border border-line bg-surface-sunk p-4">
-        <span className="flex h-24 w-28 flex-shrink-0 items-center justify-center rounded-lg bg-surface-raised">
-          <BpmnSymbolGlyph render={symbol.render} label={symbol.namePt} />
+        <span className="flex h-24 w-32 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-raised">
+          <BpmnSymbolGlyph
+            render={symbol.render}
+            label={symbol.namePt}
+            fit={SYMBOL_BOX.detail}
+          />
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">

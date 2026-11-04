@@ -3,7 +3,7 @@
 import { AlertTriangle, Info, Lightbulb } from "lucide-react";
 import type { ContentBlock } from "@/types";
 import { bpmnSymbols } from "@/data/symbols";
-import { BpmnSymbolGlyph } from "@/components/bpmn/BpmnGlyph";
+import { BpmnSymbolGlyph, SYMBOL_BOX } from "@/components/bpmn/BpmnGlyph";
 import { DiagramView } from "@/components/bpmn/DiagramView";
 import { cn } from "@/lib/utils";
 
@@ -55,11 +55,11 @@ function Block({ block }: { block: ContentBlock }) {
                 className="rounded-xl border border-line bg-surface-sunk p-4"
               >
                 <div className="flex items-start gap-3">
-                  <span className="flex h-14 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-surface-raised">
+                  <span className="flex h-16 w-24 flex-shrink-0 items-center justify-center rounded-lg bg-surface-raised">
                     <BpmnSymbolGlyph
                       render={symbol.render}
                       label={symbol.namePt}
-                      className="scale-90"
+                      fit={SYMBOL_BOX.chip}
                     />
                   </span>
                   <div className="min-w-0">

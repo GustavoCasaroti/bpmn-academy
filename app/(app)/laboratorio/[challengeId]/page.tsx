@@ -19,7 +19,6 @@ import {
 import type { Edge } from "@xyflow/react";
 import { Badge, Button, Card, EmptyState, Modal, SectionHeader, Tabs } from "@/components/ui";
 import { DiagramView, flowToDiagram, type BpmnFlowNode } from "@/components/bpmn/DiagramView";
-import { BpmnSymbolGlyph } from "@/components/bpmn/BpmnGlyph";
 import { SymbolPalette } from "@/components/game/SymbolPalette";
 import { ValidationPanel } from "@/components/game/ValidationPanel";
 import { challenges } from "@/data/challenges";

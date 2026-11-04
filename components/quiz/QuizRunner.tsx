@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Badge, Button, Card, ProgressBar } from "@/components/ui";
 import { DiagramView } from "@/components/bpmn/DiagramView";
-import { BpmnSymbolGlyph } from "@/components/bpmn/BpmnGlyph";
+import { BpmnSymbolGlyph, SYMBOL_BOX } from "@/components/bpmn/BpmnGlyph";
 import { quizQuestions } from "@/data/quiz";
 import { bpmnSymbols } from "@/data/symbols";
 import {
@@ -515,7 +515,7 @@ export function QuizRunner() {
               <BpmnSymbolGlyph
                 render={symbol.render}
                 label={symbol.namePt}
-                className="scale-150"
+                fit={SYMBOL_BOX.hero}
               />
             </span>
           </div>

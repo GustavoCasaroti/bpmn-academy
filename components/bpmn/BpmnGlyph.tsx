@@ -768,125 +768,265 @@ function AnnotationShape({
 /* Glifo completo de um símbolo da biblioteca                          */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Dimensões intrínsecas de cada símbolo — fonte única de verdade.
+ * Toda renderização isolada (biblioteca, cards, quiz, paleta) parte daqui;
+ * o enquadramento é feito por escala proporcional, nunca por corte.
+ */
+export function symbolIntrinsic(render: BpmnSymbolRender): { w: number; h: number } {
+  switch (render.kind) {
+    case "connection":
+      return { w: 180, h: 40 };
+    case "structure": {
+      // Pools e lanes são horizontalmente extensos.
+      if (render.structure === "pool") return { w: 200, h: 78 };
+      if (render.structure === "milestone") return { w: 60, h: 52 };
+      return { w: 200, h: 64 }; // lane | participant
+    }
+    case "artifact": {
+      if (render.artifact === "dataObject") return { w: 48, h: 40 };
+      if (render.artifact === "dataStore") return { w: 48, h: 48 };
+      if (render.artifact === "group") return { w: 180, h: 110 };
+      return { w: 170, h: 46 }; // textAnnotation
+    }
+    case "event":
+      return { w: 40, h: 40 };
+    case "gateway":
+      return { w: 52, h: 52 };
+    case "task":
+      return { w: 150, h: 58 };
+    case "activity":
+      return render.activity === "expandedSubProcess"
+        ? { w: 200, h: 84 }
+        : { w: 150, h: 58 };
+  }
+}
+
+/**
+ * Escala máxima de ampliação por tipo de símbolo.
+ * Símbolos compactos (eventos, gateways, artefatos pequenos) podem ampliar
+ * para ganhar legibilidade; os extensos (pools, conexões, anotações) apenas
+ * reduzem, preservando sempre a proporção original.
+ */
+function fitMaxScale(render: BpmnSymbolRender): number {
+  switch (render.kind) {
+    case "event":
+      return 1.7;
+    case "gateway":
+      return 1.5;
+    case "task":
+      return 1.2;
+    case "activity":
+      return render.activity === "expandedSubProcess" ? 1 : 1.1;
+    case "artifact":
+      return render.artifact === "dataObject" || render.artifact === "dataStore"
+        ? 1.5
+        : 1;
+    case "connection":
+    case "structure":
+      return 1;
+  }
+}
+
+/**
+ * Caixas de enquadramento padrão por contexto de uso.
+ * Cada contexto define a área disponível; o símbolo é escalado para caber.
+ */
+export const SYMBOL_BOX = {
+  /** Palco dos cartões da biblioteca de símbolos. */
+  stage: { width: 216, height: 96 },
+  /** Visual de destaque (modal de detalhe). */
+  detail: { width: 120, height: 88 },
+  /** Miniatura em card de conteúdo (trilha, exemplos). */
+  chip: { width: 88, height: 56 },
+  /** Miniatura compacta em listas e paleta do laboratório. */
+  tiny: { width: 56, height: 40 },
+  /** Miniatura reduzida em listas de apoio (símbolos de um exemplo). */
+  micro: { width: 40, height: 32 },
+  /** Visual grande (questões de quiz e identificação). */
+  hero: { width: 160, height: 128 },
+} as const;
+
 interface SymbolGlyphProps {
   render: BpmnSymbolRender;
   showLabel?: boolean;
   label?: string;
   className?: string;
+  /**
+   * Caixa de enquadramento: o símbolo é escalado proporcionalmente para
+   * caber dentro dela — nunca cortado, nunca distorcido. Os marcadores
+   * internos escalam junto e permanecem visíveis.
+   */
+  fit?: { width: number; height: number; maxScale?: number };
 }
 
-/** Renderiza um símbolo BPMN isolado (biblioteca, cards, quiz). */
-export function BpmnSymbolGlyph({
-  render,
-  showLabel = false,
-  label,
-  className,
-}: SymbolGlyphProps) {
+/** Renderiza o conteúdo vetorial do símbolo em suas dimensões intrínsecas. */
+function renderSymbolContent(
+  render: BpmnSymbolRender,
+  showLabel: boolean,
+  label: string | undefined,
+  intrinsic: { w: number; h: number }
+): React.ReactNode {
   if (render.kind === "connection") {
     const connection =
       render.connection === "dataInput" || render.connection === "dataOutput"
         ? "association"
         : render.connection;
-    return <ConnectionGlyph connection={connection} className={className} />;
+    return <ConnectionGlyph connection={connection} />;
   }
+
   if (render.kind === "structure") {
     if (render.structure === "pool") {
       return (
-        <div className={cn("flex justify-center", className)}>
-          <BpmnGlyph kind="pool" data={{ poolName: label ?? "Pool" }} width={200} height={78} />
-        </div>
+        <BpmnGlyph
+          kind="pool"
+          data={{ poolName: label ?? "Pool" }}
+          width={intrinsic.w}
+          height={intrinsic.h}
+        />
       );
     }
     if (render.structure === "lane") {
       return (
-        <div className={cn("flex justify-center", className)}>
-          <BpmnGlyph kind="lane" data={{ laneName: label ?? "Lane" }} width={200} height={64} />
-        </div>
+        <BpmnGlyph
+          kind="lane"
+          data={{ laneName: label ?? "Lane" }}
+          width={intrinsic.w}
+          height={intrinsic.h}
+        />
       );
     }
     if (render.structure === "milestone") {
-      return (
-        <div className={cn("flex justify-center", className)}>
-          <MilestoneGlyph />
-        </div>
-      );
+      return <MilestoneGlyph />;
     }
     return (
-      <div className={cn("flex justify-center", className)}>
-        <BpmnGlyph
-          kind="pool"
-          data={{ poolName: label ?? "Participante" }}
-          width={200}
-          height={64}
-        />
-      </div>
+      <BpmnGlyph
+        kind="pool"
+        data={{ poolName: label ?? "Participante" }}
+        width={intrinsic.w}
+        height={intrinsic.h}
+      />
     );
   }
+
   if (render.kind === "artifact") {
-    const map: Record<string, { kind: NodeKind; w: number; h: number }> = {
-      dataObject: { kind: "dataObject", w: 48, h: 40 },
-      dataStore: { kind: "dataStore", w: 48, h: 48 },
-      group: { kind: "group", w: 180, h: 110 },
-      textAnnotation: { kind: "annotation", w: 170, h: 46 },
-    };
-    const cfg = map[render.artifact] ?? map.dataObject;
+    const kind: NodeKind =
+      render.artifact === "group"
+        ? "group"
+        : render.artifact === "textAnnotation"
+          ? "annotation"
+          : render.artifact === "dataStore"
+            ? "dataStore"
+            : "dataObject";
+    const data =
+      kind === "group"
+        ? { label: label ?? "Grupo" }
+        : kind === "annotation"
+          ? { label: label ?? "Anotação de texto" }
+          : {};
+    return (
+      <BpmnGlyph
+        kind={kind}
+        data={data}
+        width={intrinsic.w}
+        height={intrinsic.h}
+        showLabel={showLabel}
+      />
+    );
+  }
+
+  if (render.kind === "event") {
+    return (
+      <BpmnGlyph
+        kind={render.phase}
+        data={{ phase: render.phase, marker: render.marker }}
+        width={intrinsic.w}
+        height={intrinsic.h}
+        showLabel={showLabel}
+      />
+    );
+  }
+
+  if (render.kind === "gateway") {
+    return (
+      <BpmnGlyph
+        kind="gateway"
+        data={{ gateway: render.gateway }}
+        width={intrinsic.w}
+        height={intrinsic.h}
+        showLabel={showLabel}
+      />
+    );
+  }
+
+  // task | activity
+  const kind: NodeKind =
+    render.kind === "activity"
+      ? render.activity === "subProcess"
+        ? "subProcess"
+        : render.activity === "callActivity"
+          ? "callActivity"
+          : render.activity === "expandedSubProcess"
+            ? "expandedSubProcess"
+            : "task"
+      : "task";
+  return (
+    <BpmnGlyph
+      kind={kind}
+      data={{ taskType: render.taskType }}
+      width={intrinsic.w}
+      height={intrinsic.h}
+      showLabel={showLabel}
+    />
+  );
+}
+
+/**
+ * Renderiza um símbolo BPMN isolado (biblioteca, cards, quiz, paleta).
+ * Sem `fit`, usa as dimensões intrínsecas; com `fit`, enquadra o símbolo
+ * dentro da caixa via escala proporcional (preserva a notação BPMN 2.0).
+ */
+export function BpmnSymbolGlyph({
+  render,
+  showLabel = false,
+  label,
+  className,
+  fit,
+}: SymbolGlyphProps) {
+  const intrinsic = symbolIntrinsic(render);
+  const content = renderSymbolContent(render, showLabel, label, intrinsic);
+
+  if (!fit) {
     return (
       <div className={cn("flex items-center justify-center", className)}>
-        <BpmnGlyph
-          kind={cfg.kind}
-          data={
-            cfg.kind === "group"
-              ? { label: label ?? "Grupo" }
-              : cfg.kind === "annotation"
-                ? { label: label ?? "Anotação de texto" }
-                : {}
-          }
-          width={cfg.w}
-          height={cfg.h}
-        />
+        {content}
       </div>
     );
   }
 
-  const spec = (() => {
-    switch (render.kind) {
-      case "event":
-        return {
-          kind: render.phase as NodeKind,
-          data: { phase: render.phase, marker: render.marker } as BpmnNodeData,
-          w: 40,
-          h: 40,
-        };
-      case "gateway":
-        return {
-          kind: "gateway" as NodeKind,
-          data: { gateway: render.gateway } as BpmnNodeData,
-          w: 52,
-          h: 52,
-        };
-      case "activity":
-      case "task":
-        return {
-          kind:
-            render.kind === "activity" && render.activity === "subProcess"
-              ? ("subProcess" as NodeKind)
-              : render.kind === "activity" && render.activity === "callActivity"
-                ? ("callActivity" as NodeKind)
-                : render.kind === "activity" && render.activity === "expandedSubProcess"
-                  ? ("expandedSubProcess" as NodeKind)
-                  : ("task" as NodeKind),
-          data: { taskType: render.taskType } as BpmnNodeData,
-          w: render.kind === "activity" && render.activity === "expandedSubProcess" ? 200 : 150,
-          h: render.kind === "activity" && render.activity === "expandedSubProcess" ? 84 : 58,
-        };
-      default:
-        return { kind: "task" as NodeKind, data: {} as BpmnNodeData, w: 150, h: 58 };
-    }
-  })();
+  const maxScale = fit.maxScale ?? fitMaxScale(render);
 
+  /**
+   * Enquadramento fluido:
+   *  - a caixa ocupa o espaço disponível (100%), limitada por `fit`
+   *    e pela ampliação máxima do tipo de símbolo;
+   *  - o SVG usa viewBox + preserveAspectRatio (meet) e escala para
+   *    caber inteiro — proporção e marcadores sempre preservados,
+   *    sem corte em nenhuma largura de container.
+   */
   return (
-    <div className={cn("flex items-center justify-center", className)}>
-      <BpmnGlyph kind={spec.kind} data={spec.data} width={spec.w} height={spec.h} showLabel={showLabel} />
+    <div
+      className={cn("flex items-center justify-center", className)}
+      style={{
+        width: Math.min(fit.width, intrinsic.w * maxScale),
+        height: Math.min(fit.height, intrinsic.h * maxScale),
+        maxWidth: "100%",
+        maxHeight: "100%",
+      }}
+    >
+      <div className="h-full w-full [&>svg]:h-full [&>svg]:w-full">
+        {content}
+      </div>
     </div>
   );
 }

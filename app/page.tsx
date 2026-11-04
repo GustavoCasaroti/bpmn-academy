@@ -1,491 +1,292 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  BookOpen,
-  CheckCircle2,
-  Flame,
-  HelpCircle,
-  Layers,
-  Play,
-  Route,
-  Shapes,
-  Target,
-  Trophy,
-  Workflow,
-  Zap,
-} from "lucide-react";
-import { useMemo } from "react";
-import { Badge, Button, Card, ProgressBar, SectionHeader, Stat } from "@/components/ui";
-import { ACHIEVEMENTS, computeStats, levelFromXp } from "@/lib/progress";
-import { useProgressStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Shapes, Target, Workflow } from "lucide-react";
+import { NeonEdgeButton } from "@/components/ui/neon-edge-button";
+import FluidOrb from "@/components/ui/fluid-orb";
+import { BrandMark } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { BpmnSymbolGlyph, SYMBOL_BOX } from "@/components/bpmn/BpmnGlyph";
+import { SITE } from "@/data/config";
 import { modules, totalLessons } from "@/data/modules";
-import { challenges } from "@/data/challenges";
-import { processExamples } from "@/data/examples";
 import { bpmnSymbols } from "@/data/symbols";
+import { processExamples } from "@/data/examples";
 import { quizQuestions } from "@/data/quiz";
-import { relativeTime } from "@/lib/utils";
-import { getIcon } from "@/lib/icons";
+import type { BpmnSymbolRender } from "@/types";
 
-const ACTIVITY_ICONS: Record<string, string> = {
-  lesson: "BookOpen",
-  module: "Route",
-  challenge: "Target",
-  quiz: "HelpCircle",
-  symbol: "Shapes",
-  page: "Workflow",
-};
+/**
+ * Página inicial (Get Started).
+ * Apresenta a plataforma antes do dashboard; o CTA principal navega
+ * para /dashboard (Neon Edge Button).
+ */
 
-export default function DashboardPage() {
-  const { progress, ready } = useProgressStore();
+const FLOW: Array<{
+  render: BpmnSymbolRender;
+  label: string;
+  fit: { width: number; height: number };
+}> = [
+  {
+    render: { kind: "event", phase: "start", marker: "none" },
+    label: "Evento de início",
+    fit: { width: 56, height: 56 },
+  },
+  {
+    render: { kind: "task", taskType: "user" },
+    label: "Tarefa de usuário",
+    fit: { width: 168, height: 66 },
+  },
+  {
+    render: { kind: "gateway", gateway: "exclusive" },
+    label: "Gateway exclusivo",
+    fit: { width: 66, height: 66 },
+  },
+  {
+    render: { kind: "task", taskType: "service" },
+    label: "Tarefa de serviço",
+    fit: { width: 168, height: 66 },
+  },
+  {
+    render: { kind: "event", phase: "end", marker: "none" },
+    label: "Evento de fim",
+    fit: { width: 56, height: 56 },
+  },
+];
 
-  const stats = useMemo(
-    () =>
-      computeStats(progress, {
-        lessons: totalLessons,
-        modules: modules.length,
-        challenges: challenges.length,
-        achievements: ACHIEVEMENTS.length,
-      }),
-    [progress]
-  );
+const HIGHLIGHTS = [
+  {
+    icon: Shapes,
+    title: "Símbolos BPMN",
+    description:
+      "Eventos, atividades, gateways e conexões explicados com finalidade, exemplos e erros comuns.",
+    href: "/simbolos",
+    cta: "Abrir a biblioteca",
+  },
+  {
+    icon: Workflow,
+    title: "Interpretação de processos",
+    description:
+      "Diagramas completos comentados para ler fluxos reais do início ao fim com segurança.",
+    href: "/exemplos",
+    cta: "Ver exemplos",
+  },
+  {
+    icon: Target,
+    title: "Resolução de problemas",
+    description:
+      "Identifique falhas, corrija fluxos e monte diagramas no laboratório e nos desafios.",
+    href: "/laboratorio",
+    cta: "Ir para o laboratório",
+  },
+];
 
-  const level = levelFromXp(progress.xp);
-  const nextModule =
-    modules.find((m) => !progress.completedModules.includes(m.id)) ?? modules[0];
-  const nextLessonId =
-    nextModule.lessons.find(
-      (l) => !progress.completedLessons.includes(`${nextModule.id}::${l.id}`)
-    )?.id ?? nextModule.lessons[0]?.id;
+const STATS = [
+  { value: `${modules.length}`, label: "módulos de estudo" },
+  { value: `${totalLessons}`, label: "lições guiadas" },
+  { value: `${bpmnSymbols.length}`, label: "símbolos BPMN 2.0" },
+  { value: `${processExamples.length}`, label: "processos comentados" },
+  { value: `${quizQuestions.length}`, label: "questões de quiz" },
+];
 
-  const pendingChallenges = challenges.filter(
-    (c) => !progress.challenges[c.id]
-  );
-  const recommended =
-    pendingChallenges.find((c) =>
-      c.unlockAfter.every((id) => progress.completedModules.includes(id))
-    ) ?? pendingChallenges[0] ?? challenges[0];
-
-  const recentActivity = progress.activity.slice(0, 5);
-  const unlockedAchievements = ACHIEVEMENTS.filter((a) =>
-    progress.achievements.includes(a.id)
-  );
+export default function LandingPage() {
+  const router = useRouter();
 
   return (
-    <div className="mx-auto max-w-6xl animate-fade-up">
-      {/* ---------- Hero ---------- */}
-      <section className="relative overflow-hidden rounded-2xl border border-line bg-surface-raised p-6 shadow-card sm:p-8">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-brand-500/10 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-sky-500/10 blur-2xl" />
-
-        <div className="relative">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-400">
-            Plataforma interativa de BPMN 2.0
-          </p>
-          <h1 className="max-w-2xl text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            Aprenda BPMN na prática
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-muted sm:text-base">
-            Estude a notação pela trilha, consulte a biblioteca de símbolos, analise
-            processos reais e aplique o conhecimento no laboratório e no quiz.
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            <Button
-              href={`/trilha/${nextModule.id}`}
-              icon={<Play size={16} />}
-              size="lg"
-            >
-              {ready && stats.lessonsDone > 0
-                ? "Continuar na trilha"
-                : "Começar a trilha"}
-            </Button>
-            <Button href="/laboratorio" variant="secondary" icon={<Target size={16} />}>
-              Abrir laboratório
-            </Button>
-            <Button href="/quiz" variant="ghost" icon={<HelpCircle size={16} />}>
-              Testar conhecimento
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Estatísticas ---------- */}
-      <section className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <Stat
-          label="Progresso geral"
-          value={`${stats.overallPct}%`}
-          hint={`${stats.lessonsDone}/${stats.lessonsTotal} lições concluídas`}
-          icon={<Route size={16} />}
-        />
-        <Stat
-          label="Nível"
-          value={ready ? `Nv ${level.level} · ${level.name}` : "Nv 1"}
-          hint={ready ? `${progress.xp} XP acumulados` : "Carregando…"}
-          icon={<Zap size={16} />}
-        />
-        <Stat
-          label="Desafios"
-          value={`${stats.challengesDone}/${stats.challengesTotal}`}
-          hint="Laboratório BPMN"
-          icon={<Target size={16} />}
-        />
-        <Stat
-          label="Sequência"
-          value={
-            <>
-              {ready ? stats.streak : 0}
-              <span className="ml-1.5 inline-block align-middle text-amber-500">
-                <Flame size={18} />
-              </span>
-            </>
-          }
-          hint="dias seguidos de estudo"
-          icon={<Trophy size={16} />}
-        />
-      </section>
-
-      {/* ---------- Nível + Conquistas ---------- */}
-      <section className="mt-6 grid gap-4 lg:grid-cols-3">
-        <Card className="p-5 lg:col-span-2">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">
-                Evolução
-              </p>
-              <h2 className="mt-1 text-lg font-semibold text-ink">{level.name}</h2>
-              <p className="text-sm text-ink-muted">{level.description}</p>
-            </div>
-            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-brand-600 text-lg font-bold text-white">
-              {level.level}
-            </span>
-          </div>
-
-          <ProgressBar value={stats.levelPct} className="mt-4" />
-          <div className="mt-2 flex justify-between text-xs text-ink-subtle">
-            <span>{progress.xp} XP</span>
-            <span>
-              {stats.next
-                ? `${Math.max(0, stats.next.minXp - progress.xp)} XP para ${stats.next.name}`
-                : "Nível máximo"}
-            </span>
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-3 border-t border-line pt-4 sm:grid-cols-4">
-            <MiniMetric label="Lições" value={`${stats.lessonsDone}/${stats.lessonsTotal}`} />
-            <MiniMetric label="Módulos" value={`${stats.modulesDone}/${stats.modulesTotal}`} />
-            <MiniMetric label="Símbolos vistos" value={`${progress.visitedSymbols.length}/${bpmnSymbols.length}`} />
-            <MiniMetric
-              label="Desempenho quiz"
-              value={stats.quizPerformance > 0 ? `${stats.quizPerformance}%` : "—"}
-            />
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-ink">Conquistas</h2>
+    <div className="flex min-h-screen flex-col bg-surface text-ink">
+      {/* ---------------- Header ---------------- */}
+      <header className="sticky top-0 z-40 border-b border-line bg-surface/80 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+          <Link
+            href="/"
+            aria-label={SITE.name}
+            className="rounded-lg transition-opacity hover:opacity-80"
+          >
+            <BrandMark size={36} />
+          </Link>
+          <div className="flex items-center gap-1.5">
             <Link
-              href="/conquistas"
-              className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
+              href="/dashboard"
+              className="hidden rounded-lg px-3.5 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface-sunk hover:text-ink sm:block"
             >
-              Ver todas
+              Dashboard
             </Link>
+            <ThemeToggle className="h-10 w-10" size={18} />
           </div>
-          <p className="mt-1 text-xs text-ink-subtle">
-            {unlockedAchievements.length} de {ACHIEVEMENTS.length} desbloqueadas
-          </p>
+        </div>
+      </header>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {ACHIEVEMENTS.slice(0, 8).map((a) => {
-              const unlocked = progress.achievements.includes(a.id);
-              const Icon = getIcon(a.icon);
-              return (
-                <span
-                  key={a.id}
-                  title={`${a.name} — ${a.description}`}
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl border transition ${
-                    unlocked
-                      ? "border-amber-300 bg-amber-50 text-amber-600 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-                      : "border-line bg-surface-sunk text-ink-subtle opacity-60"
-                  }`}
+      <main className="flex-1">
+        {/* ---------------- Hero ---------------- */}
+        <section className="relative overflow-hidden">
+          {/* Fluid Orb decorativo — uso pontual, não interativo, sem competir com o conteúdo */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-24 -top-32 select-none opacity-[0.35] dark:opacity-40 sm:-right-16 sm:-top-24"
+          >
+            <FluidOrb size={420} color="#8b5cf6" />
+          </div>
+
+          <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24">
+            <div className="max-w-3xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400">
+                BPMN Academy · Plataforma de aprendizado
+              </p>
+              <h1 className="mt-4 text-balance text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-5xl">
+                Aprenda BPMN de forma visual, prática e progressiva
+              </h1>
+              <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
+                <strong className="font-semibold text-ink">
+                  BPMN (Business Process Model and Notation)
+                </strong>{" "}
+                é o padrão internacional para modelar processos de negócio.
+                Com eventos, atividades e gateways, você transforma fluxos
+                reais em diagramas claros e padronizados.
+              </p>
+              <p className="mt-3 max-w-2xl text-pretty text-base leading-relaxed text-ink-muted sm:text-lg">
+                A BPMN Academy acompanha você da teoria à aplicação: estude os
+                símbolos, interprete processos completos e resolva problemas no
+                laboratório interativo.
+              </p>
+
+              {/* CTA principal — Neon Edge Button */}
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <NeonEdgeButton
+                  onClick={() => router.push("/dashboard")}
+                  glow={false}
+                  className="min-h-12 px-1 text-[15px] font-semibold shadow-[0_0_28px_-12px_rgba(139,92,246,0.65)] hover:shadow-[0_0_34px_-12px_rgba(139,92,246,0.8)]"
                 >
-                  <Icon size={18} />
-                </span>
-              );
-            })}
-          </div>
+                  Começar a aprender
+                </NeonEdgeButton>
+                <Link
+                  href="/simbolos"
+                  className="group inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-ink-muted transition hover:text-ink"
+                >
+                  Explorar os símbolos BPMN
+                  <ArrowRight
+                    size={16}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </Link>
+              </div>
 
-          <div className="mt-5 rounded-lg bg-surface-sunk p-3">
-            <p className="text-xs leading-relaxed text-ink-muted">
-              {unlockedAchievements.length === 0
-                ? "Conclua lições e desafios para desbloquear suas primeiras medalhas."
-                : `Última conquista: ${unlockedAchievements[unlockedAchievements.length - 1].name}.`}
-            </p>
-          </div>
-        </Card>
-      </section>
-
-      {/* ---------- Próximos passos ---------- */}
-      <section className="mt-8">
-        <SectionHeader
-          eyebrow="Continue de onde parou"
-          title="Próximos passos"
-          description="Sugestões com base no seu progresso atual."
-        />
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <NextStepCard
-            icon={<Route size={18} />}
-            eyebrow="Trilha"
-            title={nextModule.title}
-            description={
-              nextLessonId
-                ? `Próxima lição: ${
-                    nextModule.lessons.find((l) => l.id === nextLessonId)?.title
-                  }`
-                : nextModule.subtitle
-            }
-            href={`/trilha/${nextModule.id}`}
-            cta="Continuar módulo"
-            progressValue={
-              nextModule.lessons.length
-                ? Math.round(
-                    (nextModule.lessons.filter((l) =>
-                      progress.completedLessons.includes(`${nextModule.id}::${l.id}`)
-                    ).length /
-                      nextModule.lessons.length) *
-                      100
-                    )
-                : 0
-            }
-          />
-
-          {recommended && (
-            <NextStepCard
-              icon={<Target size={18} />}
-              eyebrow="Laboratório"
-              title={recommended.title}
-              description={recommended.situation.slice(0, 90) + "…"}
-              href={`/laboratorio/${recommended.id}`}
-              cta="Abrir desafio"
-            />
-          )}
-
-          <NextStepCard
-            icon={<HelpCircle size={18} />}
-            eyebrow="Quiz"
-            title={`${quizQuestions.length} questões avaliadas`}
-            description="Fundamentos, eventos, gateways, interpretação de diagramas e situações práticas."
-            href="/quiz"
-            cta="Iniciar quiz"
-            progressValue={stats.quizPerformance}
-          />
-        </div>
-      </section>
-
-      {/* ---------- Explorar ---------- */}
-      <section className="mt-8">
-        <SectionHeader
-          eyebrow="Conteúdo"
-          title="Explore a plataforma"
-          description="Biblioteca de símbolos, exemplos comentados e a trilha completa."
-        />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <ExploreCard
-            icon={<Shapes size={20} />}
-            title="Biblioteca de símbolos"
-            description={`${bpmnSymbols.length} símbolos com finalidade, quando usar, erros comuns e mini-exemplos.`}
-            href="/simbolos"
-          />
-          <ExploreCard
-            icon={<Workflow size={20} />}
-            title="Exemplos de processos"
-            description={`${processExamples.length} processos completos com passo a passo, decisões e simulação.`}
-            href="/exemplos"
-          />
-          <ExploreCard
-            icon={<Layers size={20} />}
-            title="Trilha de aprendizado"
-            description={`${modules.length} módulos e ${totalLessons} lições do básico à aplicação prática.`}
-            href="/trilha"
-          />
-        </div>
-      </section>
-
-      {/* ---------- Como funciona ---------- */}
-      <section className="mt-8">
-        <SectionHeader
-          eyebrow="Método"
-          title="Como funciona"
-          description="Quatro etapas para dominar a notação BPMN 2.0."
-        />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            {
-              icon: <BookOpen size={18} />,
-              title: "1. Estude",
-              text: "Siga a trilha e leia cada lição com exemplos de diagrama.",
-            },
-            {
-              icon: <Shapes size={18} />,
-              title: "2. Consulte",
-              text: "Use a biblioteca de símbolos como referência rápida.",
-            },
-            {
-              icon: <Target size={18} />,
-              title: "3. Pratique",
-              text: "Monte, corrija e simule processos no laboratório.",
-            },
-            {
-              icon: <CheckCircle2 size={18} />,
-              title: "4. Avalie-se",
-              text: "Responda ao quiz e acompanhe seu nível e conquistas.",
-            },
-          ].map((step) => (
-            <Card key={step.title} className="p-4">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-                {step.icon}
-              </span>
-              <h3 className="mt-3 text-sm font-semibold text-ink">{step.title}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-ink-muted">{step.text}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* ---------- Última atividade ---------- */}
-      {recentActivity.length > 0 && (
-        <section className="mt-8">
-          <SectionHeader title="Última atividade" />
-          <Card className="divide-y divide-line">
-            {recentActivity.map((entry) => {
-              const Icon = getIcon(ACTIVITY_ICONS[entry.type] ?? "Workflow");
-              return (
-                <div key={entry.id} className="flex items-center gap-3 px-4 py-3">
-                  <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-surface-sunk text-ink-muted">
-                    <Icon size={15} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-ink">
-                      {entry.label}
-                    </p>
-                    <p className="text-xs text-ink-subtle">
-                      {relativeTime(entry.at)}
-                    </p>
+              {/* Faixa de fluxo decorativa com os símbolos reais da notação */}
+              <div
+                aria-hidden="true"
+                className="mt-12 flex flex-wrap items-center justify-center gap-x-2 gap-y-3 rounded-2xl border border-line bg-surface-raised/70 px-4 py-5 backdrop-blur sm:justify-start"
+              >
+                {FLOW.map((item, index) => (
+                  <div key={item.label} className="flex items-center gap-2">
+                    {index > 0 && (
+                      <svg
+                        width="26"
+                        height="10"
+                        viewBox="0 0 26 10"
+                        fill="none"
+                        className="text-ink-subtle"
+                      >
+                        <path
+                          d="M0 5h20m0 0-4-4m4 4-4 4"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                    <BpmnSymbolGlyph
+                      render={item.render}
+                      label={item.label}
+                      fit={item.fit}
+                    />
                   </div>
-                  {entry.xp > 0 && (
-                    <Badge tone="success">+{entry.xp} XP</Badge>
-                  )}
-                </div>
-              );
-            })}
-          </Card>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
-      )}
 
-      {/* ---------- CTA ---------- */}
-      <section className="mt-8 rounded-2xl border border-brand-200 bg-brand-50 p-6 text-center dark:border-brand-800 dark:bg-brand-900/30">
-        <h2 className="text-lg font-semibold text-brand-800 dark:text-brand-200">
-          Pronto para colocar a mão na massa?
-        </h2>
-        <p className="mx-auto mt-1 max-w-xl text-sm text-brand-700/90 dark:text-brand-300/90">
-          O laboratório reúne 10 desafios: monte processos do zero, corrija erros de
-          notação, identifique símbolos e simule fluxos.
-        </p>
-        <div className="mt-4 flex flex-wrap justify-center gap-2.5">
-          <Button href="/laboratorio" icon={<ArrowRight size={16} />}>
-            Ir para o laboratório
-          </Button>
-          <Button href="/trilha" variant="secondary">
-            Ver a trilha completa
-          </Button>
+        {/* ---------------- Destaques ---------------- */}
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {HIGHLIGHTS.map(({ icon: Icon, title, description, href, cta }) => (
+              <Link
+                key={title}
+                href={href}
+                className="group flex flex-col rounded-2xl border border-line bg-surface-raised p-6 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-card-hover"
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface-sunk text-brand-600 dark:text-brand-400">
+                  <Icon size={20} aria-hidden="true" />
+                </span>
+                <h2 className="mt-4 text-base font-semibold text-ink">
+                  {title}
+                </h2>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-muted">
+                  {description}
+                </p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 dark:text-brand-400">
+                  {cta}
+                  <ArrowRight
+                    size={15}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------------- Números ---------------- */}
+        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+          <div className="rounded-2xl border border-line bg-surface-raised px-4 py-6 sm:px-8">
+            <dl className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
+              {STATS.map((stat) => (
+                <div key={stat.label} className="text-center sm:text-left">
+                  <dt className="text-2xl font-semibold tracking-tight text-ink">
+                    {stat.value}
+                  </dt>
+                  <dd className="mt-1 text-xs leading-snug text-ink-muted">
+                    {stat.label}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        {/* ---------------- CTA final ---------------- */}
+        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+          <div className="flex flex-col items-center gap-5 rounded-2xl border border-line bg-surface-sunk px-6 py-12 text-center">
+            <BrandMark size={56} />
+            <h2 className="max-w-xl text-balance text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              Pronto para modelar o seu primeiro processo?
+            </h2>
+            <p className="max-w-lg text-sm leading-relaxed text-ink-muted sm:text-base">
+              Acesse o dashboard, continue sua trilha de aprendizado e evolua
+              no seu ritmo.
+            </p>
+            <NeonEdgeButton
+              onClick={() => router.push("/dashboard")}
+              glow={false}
+              className="min-h-12 px-1 text-[15px] font-semibold shadow-[0_0_28px_-12px_rgba(139,92,246,0.65)] hover:shadow-[0_0_34px_-12px_rgba(139,92,246,0.8)]"
+            >
+              Começar a aprender
+            </NeonEdgeButton>
+          </div>
+        </section>
+      </main>
+
+      {/* ---------------- Footer ---------------- */}
+      <footer className="border-t border-line">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-center sm:flex-row sm:px-6 sm:text-left">
+          <div className="flex items-center gap-2.5">
+            <BrandMark size={28} />
+            <span className="text-sm font-semibold text-ink">{SITE.name}</span>
+          </div>
+          <p className="text-xs text-ink-subtle">
+            {SITE.tagline} · Notação BPMN 2.0
+          </p>
         </div>
-      </section>
+      </footer>
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Subcomponentes                                                      */
-/* ------------------------------------------------------------------ */
-
-function MiniMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-xs text-ink-subtle">{label}</p>
-      <p className="mt-0.5 text-sm font-semibold text-ink">{value}</p>
-    </div>
-  );
-}
-
-function NextStepCard({
-  icon,
-  eyebrow,
-  title,
-  description,
-  href,
-  cta,
-  progressValue,
-}: {
-  icon: React.ReactNode;
-  eyebrow: string;
-  title: string;
-  description: string;
-  href: string;
-  cta: string;
-  progressValue?: number;
-}) {
-  return (
-    <Card hover className="flex flex-col p-5">
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-white">
-        {icon}
-      </span>
-      <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-ink-subtle">
-        {eyebrow}
-      </p>
-      <h3 className="mt-1 text-base font-semibold text-ink">{title}</h3>
-      <p className="mt-1 flex-1 text-sm leading-relaxed text-ink-muted">
-        {description}
-      </p>
-      {typeof progressValue === "number" && (
-        <ProgressBar value={progressValue} className="mt-3" />
-      )}
-      <Link
-        href={href}
-        className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
-      >
-        {cta}
-        <ArrowRight size={15} />
-      </Link>
-    </Card>
-  );
-}
-
-function ExploreCard({
-  icon,
-  title,
-  description,
-  href,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  href: string;
-}) {
-  return (
-    <Link href={href}>
-      <Card hover className="h-full p-5">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-sunk text-brand-600 dark:text-brand-400">
-          {icon}
-        </span>
-        <h3 className="mt-3 text-base font-semibold text-ink">{title}</h3>
-        <p className="mt-1 text-sm leading-relaxed text-ink-muted">{description}</p>
-        <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 dark:text-brand-400">
-          Acessar <ArrowRight size={15} />
-        </span>
-      </Card>
-    </Link>
   );
 }

@@ -17,7 +17,7 @@ export const SITE = {
 } as const;
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Início", icon: "LayoutDashboard", description: "Seu progresso e próximos passos" },
+  { href: "/dashboard", label: "Dashboard", icon: "LayoutDashboard", description: "Seu progresso e próximos passos" },
   { href: "/trilha", label: "Trilha de aprendizado", icon: "Route", description: "7 módulos do básico à aplicação" },
   { href: "/simbolos", label: "Biblioteca de símbolos", icon: "Shapes", description: "Todos os símbolos BPMN 2.0" },
   { href: "/exemplos", label: "Exemplos de processos", icon: "Workflow", description: "8 processos completos comentados" },

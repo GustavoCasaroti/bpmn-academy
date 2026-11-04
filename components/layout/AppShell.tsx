@@ -9,29 +9,8 @@ import { levelFromXp, levelProgress, nextLevel } from "@/lib/progress";
 import { useProgressStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { ProgressBar } from "@/components/ui";
-
-function useTheme() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem("bpmn-academy:theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial = stored === "dark" || (!stored && prefersDark) ? "dark" : "light";
-    setTheme(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
-    setMounted(true);
-  }, []);
-
-  const toggle = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    document.documentElement.classList.toggle("dark", next === "dark");
-    window.localStorage.setItem("bpmn-academy:theme", next);
-  };
-
-  return { theme, toggle, mounted };
-}
+import { BrandMark } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 function NavList({
   pathname,
@@ -46,9 +25,7 @@ function NavList({
     <nav className="flex flex-col gap-1">
       {NAV_ITEMS.map((item) => {
         const active =
-          item.href === "/"
-            ? pathname === "/"
-            : pathname.startsWith(item.href);
+          pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = getIcon(item.icon);
         return (
           <Link
@@ -117,7 +94,6 @@ function LevelCard() {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const { theme, toggle, mounted } = useTheme();
 
   useEffect(() => {
     setMenuOpen(false);
@@ -132,16 +108,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [menuOpen]);
 
-  const ThemeIcon = mounted && theme === "dark" ? getIcon("Sun") : getIcon("Moon");
-
   return (
     <div className="min-h-screen bg-surface">
       {/* ---------- Sidebar (desktop) ---------- */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col border-r border-line bg-surface-raised lg:flex">
         <div className="flex items-center gap-2.5 px-5 py-5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-            {SITE.shortName}
-          </span>
+          <BrandMark size={36} />
           <span className="text-[15px] font-semibold tracking-tight text-ink">
             {SITE.name}
           </span>
@@ -159,19 +131,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* ---------- Header (mobile) ---------- */}
       <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-3 border-b border-line bg-surface-raised/90 px-4 backdrop-blur lg:hidden">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
-            {SITE.shortName}
-          </span>
+          <BrandMark size={32} />
           <span className="text-sm font-semibold text-ink">{SITE.name}</span>
         </div>
         <div className="flex items-center gap-1">
-          <button
-            onClick={toggle}
-            aria-label="Alternar tema"
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-muted transition hover:bg-surface-sunk"
-          >
-            <ThemeIcon size={18} />
-          </button>
+          <ThemeToggle className="h-10 w-10" size={18} />
           <button
             onClick={() => setMenuOpen(true)}
             aria-label="Abrir menu"
@@ -193,9 +157,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="absolute inset-y-0 left-0 flex w-[86%] max-w-xs flex-col bg-surface-raised shadow-pop animate-slide-in-right">
             <div className="flex items-center justify-between px-4 py-4">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-                  {SITE.shortName}
-                </span>
+                <BrandMark size={36} />
                 <span className="text-sm font-semibold text-ink">
                   {SITE.name}
                 </span>
@@ -235,13 +197,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               Quiz
             </Link>
-            <button
-              onClick={toggle}
-              aria-label="Alternar tema"
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-ink-muted transition hover:bg-surface-sunk"
-            >
-              <ThemeIcon size={16} />
-            </button>
+            <ThemeToggle className="border border-line" />
           </div>
         </div>
 

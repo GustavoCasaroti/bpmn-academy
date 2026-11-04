@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Badge, Button, Card, EmptyState, SectionHeader } from "@/components/ui";
 import { DiagramView } from "@/components/bpmn/DiagramView";
-import { BpmnSymbolGlyph } from "@/components/bpmn/BpmnGlyph";
+import { BpmnSymbolGlyph, SYMBOL_BOX } from "@/components/bpmn/BpmnGlyph";
 import { processExamples } from "@/data/examples";
 import { bpmnSymbols } from "@/data/symbols";
 import { startSimulation, answerSimulation, simulationSummary } from "@/lib/simulation";
@@ -424,7 +424,7 @@ export default function ExemploDetalhePage({
                         <BpmnSymbolGlyph
                           render={symbol.render}
                           label={symbol.namePt}
-                          className="scale-75"
+                          fit={SYMBOL_BOX.micro}
                         />
                       </span>
                       <span className="min-w-0 flex-1">

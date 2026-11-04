@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { bpmnSymbols, symbolCategories } from "@/data/symbols";
-import { BpmnSymbolGlyph } from "@/components/bpmn/BpmnGlyph";
+import { BpmnSymbolGlyph, SYMBOL_BOX } from "@/components/bpmn/BpmnGlyph";
 import { cn } from "@/lib/utils";
 import type { BpmnSymbol, SymbolCategory } from "@/types";
 
@@ -129,11 +129,11 @@ export function SymbolPalette({
                 title={`${symbol.namePt} — clique para adicionar`}
                 className="group flex flex-col items-center gap-1 rounded-lg border border-line bg-surface-raised px-1.5 py-2 transition hover:border-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/30"
               >
-                <span className="flex h-10 w-12 items-center justify-center">
+                <span className="flex h-11 w-16 items-center justify-center">
                   <BpmnSymbolGlyph
                     render={symbol.render}
                     label={symbol.namePt}
-                    className="scale-75"
+                    fit={SYMBOL_BOX.tiny}
                   />
                 </span>
                 <span className="w-full truncate text-center text-[10px] leading-tight text-ink-muted group-hover:text-ink">

@@ -3,6 +3,14 @@
 @tailwind utilities;
 
 :root {
+  /* ---------------------------------------------------------------- */
+  /* Tipografia — fonte única de toda a aplicação.                     */
+  /* --font-sans é definido pelo next/font (Inter) no layout raiz.     */
+  /* Alterando aqui (ou a fonte no layout) muda a aplicação inteira.   */
+  /* ---------------------------------------------------------------- */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-sans);
+
   --surface: 248 250 252;
   --surface-raised: 255 255 255;
   --surface-sunk: 241 245 249;
@@ -68,6 +76,13 @@ body {
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Anel de foco acessível (usado pelo Neon Edge Button e demais CTAs) */
+  .focus-ring:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+    border-radius: 10px;
   }
 
   .no-scrollbar::-webkit-scrollbar {

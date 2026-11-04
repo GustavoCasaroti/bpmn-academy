@@ -1,8 +1,18 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { ProgressProvider } from "@/lib/store";
-import { AppShell } from "@/components/layout/AppShell";
 import { SITE } from "@/data/config";
+
+/**
+ * Tipografia global: uma única família sans-serif (Inter variável).
+ * A variável --font-sans alimenta o tailwind (fontFamily.sans) e todo o CSS.
+ * Para trocar a fonte da aplicação inteira, altere apenas aqui.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -36,14 +46,12 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen bg-surface font-sans text-ink antialiased">
-        <ProgressProvider>
-          <AppShell>{children}</AppShell>
-        </ProgressProvider>
+        {children}
       </body>
     </html>
   );
