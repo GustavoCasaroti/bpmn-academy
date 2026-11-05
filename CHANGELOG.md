@@ -135,6 +135,22 @@ Alterações em revisão — nenhum commit realizado até o momento.
 
 ### Alterado
 
+#### Quiz — limite de 35 questões por sessão e sorteio aleatório
+
+- `components/quiz/QuizRunner.tsx`:
+  - opções de quantidade passam de `5, 10, 15, 30` para
+    **`5, 10, 15, 35`**, com constante `MAX_QUESTIONS = 35` — **acabou a
+    opção "Todas"**: nenhum início de quiz ultrapassa 35 questões
+    (teto aplicado também em `start()` via `Math.min(count,
+    MAX_QUESTIONS, pool.length)`);
+  - **sorteio garantido a cada início**: `start()` sempre reembaralha o
+    pool com Fisher-Yates (`shuffle`) antes de cortar, então duas sessões
+    com os mesmos filtros recebem seleções diferentes — inclusive no
+    botão "Refazer com os mesmos filtros";
+  - textos do setup atualizados: descrição explica o sorteio aleatório e o
+    teto de 35, e o rodapé passa a exibir "sorteadas" em vez de
+    "selecionadas".
+
 #### Sistema de dimensionamento dos símbolos (correção principal)
 
 - **Antes**: símbolos renderizados com tamanho fixo + `scale-*` de CSS,

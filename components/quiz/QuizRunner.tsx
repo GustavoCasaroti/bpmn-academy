@@ -51,7 +51,9 @@ const DIFFICULTY_FILTERS: (QuizDifficulty | "all")[] = [
   "avancado",
 ];
 
-const COUNT_OPTIONS = [5, 10, 15, 30] as const;
+/** Opções de quantidade — no máximo 35 questões por quiz. */
+const COUNT_OPTIONS = [5, 10, 15, 35] as const;
+const MAX_QUESTIONS = 35;
 
 function shuffle<T>(items: T[]): T[] {
   const arr = [...items];
@@ -97,7 +99,9 @@ export function QuizRunner() {
   /* ---------------- configuração ---------------- */
 
   const start = () => {
-    const selected = shuffle(pool).slice(0, Math.min(count, pool.length));
+    // Sorteio aleatório a cada início, respeitando o teto de questões.
+    const size = Math.min(count, MAX_QUESTIONS, pool.length);
+    const selected = shuffle(pool).slice(0, size);
     if (selected.length === 0) return;
     setQuestions(selected);
     setAnswers({});
@@ -177,9 +181,10 @@ export function QuizRunner() {
       <Card className="p-5 sm:p-6">
         <h2 className="text-lg font-semibold text-ink">Configure seu quiz</h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Escolha o escopo e responda questão a questão. Cada acerto vale XP —
-          100% em um quiz com 10 ou mais questões desbloqueia a conquista "Nota
-          máxima".
+          Escolha o escopo e responda questão a questão — a cada início as
+          questões são sorteadas aleatoriamente, com no máximo {MAX_QUESTIONS}{" "}
+          por quiz. Cada acerto vale XP — 100% em um quiz com 10 ou mais
+          questões desbloqueia a conquista &quot;Nota máxima&quot;.
         </p>
 
         {/* Categoria */}
@@ -264,7 +269,7 @@ export function QuizRunner() {
                     disabled && "cursor-not-allowed opacity-40"
                   )}
                 >
-                  {n === 30 ? "Todas" : n}
+                  {n}
                   {n > pool.length && pool.length > 0 && ` (máx. ${pool.length})`}
                 </button>
               );
@@ -276,7 +281,7 @@ export function QuizRunner() {
           <p className="text-sm text-ink-muted">
             {pool.length === 0
               ? "Nenhuma questão corresponde aos filtros escolhidos."
-              : `Disponíveis: ${pool.length} ${pool.length === 1 ? "questão" : "questões"} · selecionadas: ${Math.min(count, pool.length)}`}
+              : `Disponíveis: ${pool.length} ${pool.length === 1 ? "questão" : "questões"} · sorteadas: ${Math.min(count, MAX_QUESTIONS, pool.length)}`}
           </p>
           <Button
             onClick={start}

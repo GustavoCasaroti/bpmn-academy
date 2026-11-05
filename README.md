@@ -16,7 +16,7 @@ Aplicação web completa, responsiva e sem backend — todo o progresso fica sal
   - **Corrigir** — diagramas com problemas intencionais validados pelas regras da notação
   - **Identificar** — reconheça os elementos clicando no diagrama
   - **Simular** — execute o fluxo escolhendo os caminhos nas decisões e veja o token percorrer o processo
-- **❓ Quiz** — 100 questões em 8 categorias e 3 dificuldades, com explicação por questão e desempenho por categoria
+- **❓ Quiz** — 100 questões em 8 categorias e 3 dificuldades, com explicação por questão e desempenho por categoria; cada sessão sorteia aleatoriamente no máximo **35 questões**
 - **🏆 Gamificação** — XP, 5 níveis, 8 conquistas, sequência de dias e histórico de atividades
 
 ## 🎯 Validação de diagramas
