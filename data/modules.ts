@@ -1192,7 +1192,7 @@ export const modules: LearningModule[] = [
           {
             type: "text",
             text:
-              "O quiz reúne 30 questões distribuídas em oito categorias, com dificuldades progressivas. As questões de diagrama pedem interpretação real de um fluxo — não decore, pratique a leitura.",
+              "O quiz reúne 100 questões distribuídas em oito categorias, com dificuldades progressivas. As questões de diagrama pedem interpretação real de um fluxo — não decore, pratique a leitura.",
           },
           {
             type: "bullets",

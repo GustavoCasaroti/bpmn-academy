@@ -22,7 +22,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/simbolos", label: "Biblioteca de símbolos", icon: "Shapes", description: "Todos os símbolos BPMN 2.0" },
   { href: "/exemplos", label: "Exemplos de processos", icon: "Workflow", description: "8 processos completos comentados" },
   { href: "/laboratorio", label: "Laboratório BPMN", icon: "FlaskConical", description: "Monte, corrija, identifique e simule" },
-  { href: "/quiz", label: "Quiz de conhecimentos", icon: "HelpCircle", description: "30 questões avaliadas" },
+  { href: "/quiz", label: "Quiz de conhecimentos", icon: "HelpCircle", description: "100 questões avaliadas" },
   { href: "/conquistas", label: "Conquistas", icon: "Trophy", description: "Medalhas, níveis e histórico" },
 ];
 

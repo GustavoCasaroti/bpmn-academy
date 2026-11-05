@@ -16,7 +16,7 @@ Aplicação web completa, responsiva e sem backend — todo o progresso fica sal
   - **Corrigir** — diagramas com problemas intencionais validados pelas regras da notação
   - **Identificar** — reconheça os elementos clicando no diagrama
   - **Simular** — execute o fluxo escolhendo os caminhos nas decisões e veja o token percorrer o processo
-- **❓ Quiz** — 30 questões em 8 categorias e 3 dificuldades, com explicação por questão e desempenho por categoria
+- **❓ Quiz** — 100 questões em 8 categorias e 3 dificuldades, com explicação por questão e desempenho por categoria
 - **🏆 Gamificação** — XP, 5 níveis, 8 conquistas, sequência de dias e histórico de atividades
 
 ## 🎯 Validação de diagramas
@@ -90,11 +90,12 @@ npm start
 - Acessibilidade: contraste validado por Lighthouse (1.0), `aria-label` nos controles interativos
 - Configurações visuais centralizadas: tipografia (`--font-sans`), identidade (marca/favicon) e tema em pontos únicos de alteração
 - Modais renderizados via portal (`document.body`), imunes a ancestrais com `transform`/animação
+- Overlays integrados ao histórico via `useHistoryDismiss`: o "voltar" do navegador/celular fecha modal e drawer (sem navegar), e fechar pelo X/Esc/backdrop limpa a entrada — sem entradas órfãs no histórico
 
 ## 📱 Responsividade
 
 - **Desktop (≥1024px):** sidebar fixa com navegação completa; landing e biblioteca aproveitam a largura disponível
-- **Mobile:** header compacto com botão de menu que abre um drawer com overlay; abas da biblioteca com rolagem horizontal
+- **Mobile:** header compacto com botão de menu que abre um drawer com overlay (fechável por toque fora, X, Esc ou pelo botão "voltar" nativo); abas da biblioteca com rolagem horizontal; bottom-sheet para modais; tap targets ≥32px e texto ≥11px
 - Tema claro/escuro com persistência e pré-aplicação via script anti-flashing
 - Símbolos BPMN sempre enquadrados proporcionalmente, sem corte em nenhuma largura de tela
 

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { NAV_ITEMS, SITE } from "@/data/config";
 import { getIcon } from "@/lib/icons";
 import { levelFromXp, levelProgress, nextLevel } from "@/lib/progress";
 import { useProgressStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { ProgressBar } from "@/components/ui";
+import { useHistoryDismiss } from "@/components/ui/useHistoryDismiss";
 import { BrandMark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
@@ -18,7 +19,7 @@ function NavList({
   compact = false,
 }: {
   pathname: string;
-  onNavigate?: () => void;
+  onNavigate?: (href: string) => void;
   compact?: boolean;
 }) {
   return (
@@ -31,7 +32,7 @@ function NavList({
           <Link
             key={item.href}
             href={item.href}
-            onClick={onNavigate}
+            onClick={() => onNavigate?.(item.href)}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
               active
@@ -95,6 +96,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  /**
+   * Histórico: "voltar" do dispositivo fecha o drawer em vez de navegar;
+   * fechar pelo X/Esc/backdrop remove a entrada do histórico.
+   */
+  const requestClose = useHistoryDismiss(menuOpen, closeMenu);
+
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
@@ -102,11 +110,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") requestClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
+  }, [menuOpen, requestClose]);
 
   return (
     <div className="min-h-screen bg-surface">
@@ -150,8 +158,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       {menuOpen && (
         <div
           className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm lg:hidden"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setMenuOpen(false);
+          onPointerDown={(e) => {
+            if (e.target === e.currentTarget) requestClose();
           }}
         >
           <div className="absolute inset-y-0 left-0 flex w-[86%] max-w-xs flex-col bg-surface-raised shadow-pop animate-slide-in-right">
@@ -163,15 +171,23 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </span>
               </div>
               <button
-                onClick={() => setMenuOpen(false)}
+                onClick={requestClose}
                 aria-label="Fechar menu"
-                className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-sunk"
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-sunk sm:h-10 sm:w-10"
               >
                 <CloseIcon />
               </button>
             </div>
             <div className="scrollbar-thin flex-1 overflow-y-auto px-3 pb-4">
-              <NavList pathname={pathname} onNavigate={() => setMenuOpen(false)} />
+              <NavList
+                pathname={pathname}
+                onNavigate={(href) => {
+                  // Rota diferente: a navegação fecha o drawer (o histórico
+                  // é resolvido pós-navegação, sem entrada órfã pendente).
+                  // Mesma rota: fecha como um fechamento explícito.
+                  if (href === pathname) requestClose();
+                }}
+              />
             </div>
             <div className="border-t border-line px-4 py-4">
               <LevelCard />

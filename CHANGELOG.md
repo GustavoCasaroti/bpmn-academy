@@ -34,6 +34,65 @@ Alterações em revisão — nenhum commit realizado até o momento.
 - Cabeçalho e rodapé próprios da landing com marca, navegação para o
   dashboard e alternância de tema.
 
+#### Quiz — expansão para 100 questões e revisão geral
+
+- `data/quiz.ts` ampliado de **30 para 100 questões** (IDs `q-01` a `q-100`)
+  em duas entregas: +10 no nível Avançado e depois +20 em **cada** nível
+  (Fácil, Intermediário e Avançado). Distribuição final por nível:
+  **Fácil 32, Intermediário 32, Avançado 36**; por tipo: **53 MCQ,
+  22 V/F, 7 de símbolo e 18 de diagrama**; por categoria: fundamentos 16,
+  gateways 15, eventos 14, atividades 14, conexões 12, interpretação 12,
+  pools 9, práticas 8.
+- **14 questões de diagrama para solução/leitura de fluxo adicionadas**
+  (9 na primeira entrega, 5 na segunda): percurso do token em gateway
+  exclusivo (`q-31`), retenção na junção paralela (`q-32`), atividade
+  isolada (`q-33`), corrida no gateway baseado em eventos (`q-35`),
+  fluxo de mensagem entre pools (`q-37`), leitura linear (`q-57`),
+  caminho do exclusivo (`q-58`), inclusivo com duas condições (`q-78`),
+  mensagem inválida dentro da mesma pool (`q-79`), objeto de dados em
+  contexto (`q-87`), divisão paralela com junção exclusiva (`q-89`),
+  evento de fim com saída (`q-95`), cruzamento de lanes (`q-96`) e
+  evento de fronteira de temporizador (`q-99`).
+- Temas novos cobrindo lacunas: OMG como publicador, evento condicional,
+  sinal vs mensagem, tarefa de script, múltiplas instâncias, transação,
+  compensação, escalonamento vs erro, coreografia, terminação, gateway
+  complexo, fluxo padrão (default), marcos sem símbolo oficial, pool em
+  caixa-preta, armazenamento de dados e grupos.
+- **Revisão das 100 questões (estrutural + de conteúdo)**:
+  - validação automatizada: IDs únicos, `correctOptionId` sempre presente
+    nas opções, 2 opções em V/F e 4 nos demais tipos, `symbolId`s
+    existentes em `data/symbols.ts`, `highlightNodeIds` presentes nos
+    diagramas, arestas apontando nós válidos, zero enunciados duplicados
+    e zero enunciados similares acima do limite (pares de mesmo molde
+    reescritos: `q-52`, `q-70`, `q-73`, `q-93`);
+  - conferência manual do par enunciado → resposta correta nas 100,
+    incluindo consistência com os textos de `data/symbols.ts`.
+- Referências de contagem atualizadas para 100: `data/config.ts`,
+  `data/modules.ts` e `README.md`. As telas (`/`, `/quiz`, dashboard)
+  usam `quizQuestions.length` e se ajustam automaticamente.
+
+#### Integração com o botão "voltar" do navegador (mobile)
+
+- Novo hook `components/ui/useHistoryDismiss.ts` que integra overlays
+  (modal e drawer de navegação) com o histórico do navegador:
+  - Ao abrir, o overlay empilha uma entrada no histórico (estado
+    `__bpmnOverlay`); a pilha global (`openStack`) permite overlays
+    aninhados, sempre fechando o do topo.
+  - **Pressionar o "voltar" nativo do dispositivo com o overlay aberto
+    fecha o overlay em vez de navegar para a página anterior** — correção
+    do problema reportado na biblioteca de símbolos no mobile.
+  - Fechar de forma explícita (X, Esc, backdrop) remove a entrada com
+    `history.back()`, então o histórico não cresce a cada abertura e não
+    ficam entradas "mortas".
+  - Navegação feita com o overlay aberto (ex.: drawer → rota diferente)
+    deixa uma entrada órfã, que é **pulada automaticamente** na primeira
+    volta (guarda por contador `strandedOrphans` — sem depender da
+    Navigation API, cujo `navigationType` o Next.js sobrescreve como
+    `replace` durante o `popstate`).
+- `Modal` (`components/ui/index.tsx`) e drawer do `AppShell` integrados ao
+  hook via `requestClose`; backdrop trocado de `onMouseDown` para
+  `onPointerDown` (mais confiável em toques).
+
 #### Identidade visual
 
 - Favicon `app/icon.svg` com a marca derivada da imagem de referência
@@ -137,6 +196,27 @@ Alterações em revisão — nenhum commit realizado até o momento.
   documento e fora da viewport. O componente `Modal` agora é renderizado via
   `createPortal` em `document.body`, corrigindo isso em todas as páginas que
   utilizam modais.
+- **Revisão mobile (responsividade)**:
+  - **Overflow horizontal** em `/exemplos` e `/trilha/[moduleId]` —
+    `grid-cols-1` (= `minmax(0,1fr)`) adicionado a 15 grids implícitos/
+    explícitos em 4 páginas; trilhas com colunas `auto` inflavam com o
+    min-content de linhas `truncate`/`flex-shrink-0`, ultrapassando a
+    viewport. `min-w-0` na linha de símbolos dos cards e no aside da
+    trilha.
+  - **Faixa de fluxo da landing** — itens com `flex-shrink-0` e faixa em
+    `flex-nowrap overflow-x-auto`: em vez de espremer os símbolos (714px
+    em 311px), agora rola horizontalmente.
+  - **Tap targets abaixo de 32px** — back-links, CTAs ("Ver todas",
+    "Próximo passo", "Ver"), links "Ver" e controles do ReactFlow
+    (32×32 via maior especificidade em `app/globals.css`); itens de 36px
+    mantidos (passam WCAG AA).
+  - **Texto abaixo de 11px** — labels de contagem de símbolos,
+    `SymbolPalette` e badges do laboratório elevados para 11px (números
+    dentro de círculos de 20px permanecem em 10px, por legibilidade
+    intra-forma).
+  - **Colisão de IDs de gradiente** — `BrandMark` gera IDs únicos via
+    `useId()` (saneado), encerrando conflitos entre sidebar, header e
+    drawer quando o mesmo gradiente é instanciado mais de uma vez.
 
 ### Validação
 
@@ -154,3 +234,17 @@ Alterações em revisão — nenhum commit realizado até o momento.
   - Tema claro/escuro funcional na landing e no shell.
   - Enquadramento validado em largura estreita (palco de 193px) e em
     desktop (1296px).
+- **Auditoria mobile (viewport 345–360px) — 11 rotas**: zero overflow
+  horizontal, zero tap targets <32px, zero textos <11px (exceto números
+  em círculos, decisão registrada), marca presente em todas as rotas sem
+  IDs duplicados.
+- **Integração do "voltar" testada no navegador** (modal de símbolos e
+  drawer, mobile e desktop):
+  - "voltar" nativo com overlay aberto → fecha o overlay, **URL intacta**
+    (`/simbolos`, `/dashboard`), `overflow` do body liberado.
+  - X, backdrop (`pointerdown`) e Esc → fecham e removem a entrada do
+    histórico (`__bpmnOverlay: false`).
+  - Navegação pelo drawer → um único "voltar" cai direto na página de
+    origem (órfã pulada), sem entradas mortas e sem loop no avançar.
+  - Bottom-sheet do modal em mobile: colado na base, cantos arredondados,
+    X de 44px, conteúdo com rolagem interna e `safe-area-inset-bottom`.
