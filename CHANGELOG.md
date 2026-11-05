@@ -206,6 +206,22 @@ Alterações em revisão — nenhum commit realizado até o momento.
 
 ### Corrigido
 
+- **Neon Edge Button da landing não girava em volta do botão** — o
+  `conic-gradient` do beam terminava em um stop final **sem cor**
+  (`..., 340deg, 360deg`), combinação **inválida no parse do Chromium**:
+  a declaração `background` era descartada por inteiro e o beam ficava
+  com `background-image: none` (a animação `rotate` "rodava" num elemento
+  invisível; só o glow estático era perceptível). Diagnosticado com
+  `CSS.supports` (bissecção do gradiente) e corrigido em
+  `components/ui/neon-edge-button.tsx` com cor explícita em **todos**
+  os stops (`rgba(255,255,255,0)` → `rgba(255,255,255,0.85)`).
+  Verificado no browser: gradiente aplicado, animação `running` com o
+  relógio avançando e arco visível percorrendo a borda no screenshot.
+- **Neon Edge Button em tema claro** — o botão passou a ter fundo
+  `bg-[#050505]` (o mesmo da superfície interior): sem isso, a base do
+  anel era o fundo da página e o arco branco do neon ficava invisível
+  sobre o claro (branco no branco). Agora o efeito é visível nos dois
+  temas; no dark o detalhe é quase imperceptível.
 - **Modal da biblioteca de símbolos não abria visivelmente** — o `position: fixed`
   do backdrop era capturado pelo `transform` mantido pela animação `fade-up` do
   wrapper da página (containing block), deixando o modal preso ao fluxo do

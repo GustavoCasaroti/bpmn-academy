@@ -21,7 +21,7 @@ export const NeonEdgeButton: React.FC<NeonEdgeButtonProps> = ({
     <button
       type="button"
       className={cn(
-        'focus-ring group relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-[10px] p-[1px] text-sm font-medium text-[#FAFAFA] transition-all cursor-pointer active:scale-[0.98]',
+        'focus-ring group relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-[10px] bg-[#050505] p-[1px] text-sm font-medium text-[#FAFAFA] transition-all cursor-pointer active:scale-[0.98]',
         glow && 'shadow-[0_0_24px_-10px_rgba(255,255,255,0.4)]',
         className
       )}
@@ -45,7 +45,11 @@ export const NeonEdgeButton: React.FC<NeonEdgeButtonProps> = ({
         <span
           className="easyui-neon-beam absolute inset-0 block"
           style={{
-            background: 'conic-gradient(from 0deg at 50% 50%, transparent 0deg, 280deg, rgba(255,255,255,0.85) 340deg, 360deg)',
+            // Stops com cor explícita em todos os pontos: um stop final
+            // sem cor (ex.: "360deg") invalida o gradiente inteiro no parse
+            // do Chromium e o beam some (background-image: none).
+            background:
+              'conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0) 0deg, rgba(255,255,255,0) 280deg, rgba(255,255,255,0.85) 340deg, rgba(255,255,255,0.85) 360deg)',
             animation: `easyui-neon-rotate ${duration} linear infinite`,
           }}
         />
