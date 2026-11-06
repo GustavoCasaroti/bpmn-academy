@@ -16,12 +16,24 @@ Alterações em revisão — nenhum commit realizado até o momento.
   e do objetivo da plataforma, destaques para **símbolos**, **interpretação de
   processos** e **resolução de problemas**, além de estatísticas da plataforma
   e CTA final.
-- **Neon Edge Button** (`components/ui/neon-edge-button.tsx`) instalado via
-  shadcn (`Surajmaurya1/easyui/neon-edge-button`) e usado como CTA principal
-  ("Começar a aprender"), navegando para `/dashboard`. A implementação
-  original do componente foi preservada; a adaptação às cores da marca é feita
-  apenas por props/`className` (`glow={false}` + sombra violeta) e pelo
-  utilitário `.focus-ring` em `app/globals.css`.
+- **3D Button** (`components/evil-buttons/3d-button.tsx`) instalado via
+  shadcn (`@evilbuttons/3d-button`) e usado como CTA principal
+  ("Começar a aprender", hero e bloco final), navegando para `/dashboard`.
+  Botão 3D com camadas (deck + face), efeito de pressão com mola
+  (`motion/react`) e brilho/sheen no hover; adaptação às cores da marca
+  feita apenas por `className` (altura mínima, texto 15px e sombra violeta).
+  Substitui o Neon Edge Button — ver *Corrigido* para o motivo.
+  Instalado com `motion@^14.10.0` (nova dependência). O componente fica
+  **no padrão do shadcn** (face/deck com variantes `dark:`, decidido pelo
+  usuário após teste); única alteração local é `bg-linear-to-r` →
+  `bg-gradient-to-r` na faixa de brilho, pois `bg-linear-*` é sintaxe do
+  Tailwind v4 e não compila no v3.4 do projeto.
+- **Marca "BPMN Academy" volta para a landing em todas as páginas** — a
+  marca era clicável apenas no cabeçalho da landing. Agora sidebar desktop,
+  header mobile e drawer do `AppShell`, além do rodapé da landing, são
+  `Link` para `/` (com `aria-label` "Voltar para a página inicial" e fechamento
+  do drawer ao clicar). O ícone do bloco CTA final permanece decorativo (o
+  botão ao lado já leva ao dashboard).
 - **Fluid Orb** (`components/ui/fluid-orb.tsx`) instalado via shadcn
   (`swamimalode07/rare-ui/fluid-orb`) e avaliado. Uso pontual e decorativo
   apenas no hero da landing (`aria-hidden`, sem interação, respeita
@@ -206,22 +218,21 @@ Alterações em revisão — nenhum commit realizado até o momento.
 
 ### Corrigido
 
-- **Neon Edge Button da landing não girava em volta do botão** — o
-  `conic-gradient` do beam terminava em um stop final **sem cor**
-  (`..., 340deg, 360deg`), combinação **inválida no parse do Chromium**:
-  a declaração `background` era descartada por inteiro e o beam ficava
-  com `background-image: none` (a animação `rotate` "rodava" num elemento
-  invisível; só o glow estático era perceptível). Diagnosticado com
-  `CSS.supports` (bissecção do gradiente) e corrigido em
-  `components/ui/neon-edge-button.tsx` com cor explícita em **todos**
-  os stops (`rgba(255,255,255,0)` → `rgba(255,255,255,0.85)`).
-  Verificado no browser: gradiente aplicado, animação `running` com o
-  relógio avançando e arco visível percorrendo a borda no screenshot.
-- **Neon Edge Button em tema claro** — o botão passou a ter fundo
-  `bg-[#050505]` (o mesmo da superfície interior): sem isso, a base do
-  anel era o fundo da página e o arco branco do neon ficava invisível
-  sobre o claro (branco no branco). Agora o efeito é visível nos dois
-  temas; no dark o detalhe é quase imperceptível.
+- **Neon Edge Button não animava no celular (Android 10 + Brave/Chromium)
+  — substituído pelo 3D Button.** O problema foi diagnosticado com uma
+  página temporária auto-reportante (`/neon-test` → `POST /api/neon-log`,
+  ambos removidos): no aparelho o `conic-gradient` pintava, o relógio da
+  animação avançava e o `transform rotate` mudava o estilo computado
+  (50° → 170° em 1s), mas **o compositor não repintava a camada do beam** —
+  o arco ficava visualmente parado. Várias estratégias foram testadas no
+  dispositivo (stops explícitos no gradiente, `@property --na` animando o
+  ângulo sem `transform`, registro na folha global, remoção do container
+  `-inset-[200%]`); a rotação só funcionava em caixas isoladas, nunca na
+  estrutura real do botão. Decisão: **remover o Neon Edge Button**
+  (`components/ui/neon-edge-button.tsx` apagado, junto com o bloco
+  `@property`/`@keyframes` em `app/globals.css`) e usar o **3D Button**
+  (`@evilbuttons/3d-button`), cuja animação de pressão/hover via
+  `motion/react` funciona em todos os aparelhos testados.
 - **Modal da biblioteca de símbolos não abria visivelmente** — o `position: fixed`
   do backdrop era capturado pelo `transform` mantido pela animação `fade-up` do
   wrapper da página (containing block), deixando o modal preso ao fluxo do
@@ -255,7 +266,7 @@ Alterações em revisão — nenhum commit realizado até o momento.
 - `tsc --noEmit` sem erros.
 - `npm run build` sem erros (12 rotas geradas, incluindo `/` e `/icon.svg`).
 - Testes no navegador, sem erros de console em nenhuma rota:
-  - Landing em `/` navega para `/dashboard` pelo Neon Edge Button.
+  - Landing em `/` navega para `/dashboard` pelo 3D Button.
   - Abas da biblioteca com contagens corretas (40/14/10/5/3/4/4).
   - **Zero overflow** medido em todos os símbolos: cards da biblioteca,
     modal de detalhe, paleta do laboratório, quiz, chips do dashboard e

@@ -75,8 +75,9 @@ npm start
 │   ├── dashboard/          # Blocos de conteúdo (texto, diagramas, comparações)
 │   ├── game/               # Paleta de símbolos e painel de validação
 │   ├── quiz/               # Runner do quiz
-│   └── ui/                 # Primitivas (Button, Card, Modal…), marca (Logo),
-│                           # Neon Edge Button e Fluid Orb
+│   ├── ui/                 # Primitivas (Button, Card, Modal…), marca (Logo)
+│   │                       # e Fluid Orb
+│   └── evil-buttons/       # 3D Button (CTA da landing, shadcn @evilbuttons)
 ├── data/                   # Conteúdo central: símbolos, módulos, exemplos, quiz, desafios
 ├── lib/                    # Regras puras: validação, simulação, progresso, store
 └── types/                  # Contratos de tipos de todo o domínio

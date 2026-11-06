@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Shapes, Target, Workflow } from "lucide-react";
-import { NeonEdgeButton } from "@/components/ui/neon-edge-button";
+import { ThreeDButton } from "@/components/evil-buttons/3d-button";
 import FluidOrb from "@/components/ui/fluid-orb";
 import { BrandMark } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -148,15 +148,14 @@ export default function LandingPage() {
                 laboratório interativo.
               </p>
 
-              {/* CTA principal — Neon Edge Button */}
+              {/* CTA principal — 3D Button (evilbuttons) */}
               <div className="mt-8 flex flex-wrap items-center gap-4">
-                <NeonEdgeButton
+                <ThreeDButton
                   onClick={() => router.push("/dashboard")}
-                  glow={false}
-                  className="min-h-12 px-1 text-[15px] font-semibold shadow-[0_0_28px_-12px_rgba(139,92,246,0.65)] hover:shadow-[0_0_34px_-12px_rgba(139,92,246,0.8)]"
+                  className="min-h-12 text-[15px] shadow-[0_0_28px_-12px_rgba(139,92,246,0.65)]"
                 >
                   Começar a aprender
-                </NeonEdgeButton>
+                </ThreeDButton>
                 <Link
                   href="/simbolos"
                   className="group inline-flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-ink-muted transition hover:text-ink"
@@ -264,13 +263,12 @@ export default function LandingPage() {
               Acesse o dashboard, continue sua trilha de aprendizado e evolua
               no seu ritmo.
             </p>
-            <NeonEdgeButton
+            <ThreeDButton
               onClick={() => router.push("/dashboard")}
-              glow={false}
-              className="min-h-12 px-1 text-[15px] font-semibold shadow-[0_0_28px_-12px_rgba(139,92,246,0.65)] hover:shadow-[0_0_34px_-12px_rgba(139,92,246,0.8)]"
+              className="min-h-12 text-[15px] shadow-[0_0_28px_-12px_rgba(139,92,246,0.65)]"
             >
               Começar a aprender
-            </NeonEdgeButton>
+            </ThreeDButton>
           </div>
         </section>
       </main>
@@ -278,10 +276,14 @@ export default function LandingPage() {
       {/* ---------------- Footer ---------------- */}
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-center sm:flex-row sm:px-6 sm:text-left">
-          <div className="flex items-center gap-2.5">
+          <Link
+            href="/"
+            aria-label={`Voltar para a página inicial — ${SITE.name}`}
+            className="flex items-center gap-2.5 rounded-lg transition-opacity hover:opacity-80"
+          >
             <BrandMark size={28} />
             <span className="text-sm font-semibold text-ink">{SITE.name}</span>
-          </div>
+          </Link>
           <p className="text-xs text-ink-subtle">
             {SITE.tagline} · Notação BPMN 2.0
           </p>

@@ -120,11 +120,17 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-surface">
       {/* ---------- Sidebar (desktop) ---------- */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 flex-col border-r border-line bg-surface-raised lg:flex">
-        <div className="flex items-center gap-2.5 px-5 py-5">
-          <BrandMark size={36} />
-          <span className="text-[15px] font-semibold tracking-tight text-ink">
-            {SITE.name}
-          </span>
+        <div className="px-5 py-5">
+          <Link
+            href="/"
+            aria-label={`Voltar para a página inicial — ${SITE.name}`}
+            className="flex items-center gap-2.5 rounded-lg transition-opacity hover:opacity-80"
+          >
+            <BrandMark size={36} />
+            <span className="text-[15px] font-semibold tracking-tight text-ink">
+              {SITE.name}
+            </span>
+          </Link>
         </div>
 
         <div className="scrollbar-thin flex-1 overflow-y-auto px-3 pb-4">
@@ -138,10 +144,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       {/* ---------- Header (mobile) ---------- */}
       <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-3 border-b border-line bg-surface-raised/90 px-4 backdrop-blur lg:hidden">
-        <div className="flex items-center gap-2.5">
+        <Link
+          href="/"
+          aria-label={`Voltar para a página inicial — ${SITE.name}`}
+          className="flex items-center gap-2.5 rounded-lg transition-opacity hover:opacity-80"
+        >
           <BrandMark size={32} />
           <span className="text-sm font-semibold text-ink">{SITE.name}</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-1">
           <ThemeToggle className="h-10 w-10" size={18} />
           <button
@@ -164,12 +174,17 @@ export function AppShell({ children }: { children: ReactNode }) {
         >
           <div className="absolute inset-y-0 left-0 flex w-[86%] max-w-xs flex-col bg-surface-raised shadow-pop animate-slide-in-right">
             <div className="flex items-center justify-between px-4 py-4">
-              <div className="flex items-center gap-2.5">
+              <Link
+                href="/"
+                aria-label={`Voltar para a página inicial — ${SITE.name}`}
+                onClick={requestClose}
+                className="flex items-center gap-2.5 rounded-lg transition-opacity hover:opacity-80"
+              >
                 <BrandMark size={36} />
                 <span className="text-sm font-semibold text-ink">
                   {SITE.name}
                 </span>
-              </div>
+              </Link>
               <button
                 onClick={requestClose}
                 aria-label="Fechar menu"
